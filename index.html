@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Developer Kompleks Perumahan</title>
+    <link rel="stylesheet" href="login_style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="login-box">
+            <h1>Developer Kompleks Perumahan</h1>
+            <p>Silakan masukkan nama Anda untuk memulai</p>
+            <input type="text" id="username" placeholder="Masukkan Nama Anda">
+            <button id="login-button">Masuk</button>
+        </div>
+    </div>
+    <script>
+        // Simulasi login sederhana
+        document.getElementById('login-button').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            if (username.trim() !== '') {
+                const developerProfile = {
+                    name: username,
+                    capital: 0 // Modal awal 0, akan diatur di profile.html
+                };
+                localStorage.setItem('developerProfile', JSON.stringify(developerProfile));
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

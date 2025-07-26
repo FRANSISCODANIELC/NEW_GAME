@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Developer Kompleks Perumahan</title>
+    <link rel="stylesheet" href="login_style.css">
+    <style>
+        /* Gaya tambahan untuk pop-up modal */
+        .modal {
+            display: none; /* Sembunyikan secara default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content input {
+            width: calc(100% - 22px);
+            padding: 11px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        /* Tombol di dalam modal */
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        /* Tombol Mulai Permainan (dibuat sama seperti tombol login) */
+        #start-game-button {
+            background-color: #007bff;
+            color: white;
+        }
+        #start-game-button:hover {
+            background-color: #0056b3;
+        }
+        /* Tombol Batal */
+        #cancel-button {
+            background-color: #6c757d;
+            color: white;
+        }
+        #cancel-button:hover {
+            background-color: #5a6268;
+        }
+
+        /* Gaya untuk modal pemilihan map */
+        #map-selection-modal .modal-content button {
+            margin-bottom: 10px;
+        }
+        /* Gaya tambahan untuk pop-up baru */
+        #create-profile-modal .modal-content input {
+            margin-bottom: 15px;
+        }
+        #load-profile-modal .modal-content button {
+            margin-bottom: 10px;
+        }
+        #developer-detail-modal .modal-content p {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="dashboard-box">
+            <h1>Main Menu</h1>
+            <h2 id="welcome-message"></h2>
+            <button class="menu-button" id="new-game-button">New Game</button>
+            <button class="menu-button" disabled>Load Game (Segera Hadir)</button>
+            <a href="index.html" class="menu-button">Exit</a>
+        </div>
+    </div>
+
+    <!-- Modal untuk Opsi Game Baru -->
+    <div id="new-game-options-modal" class="modal">
+        <div class="modal-content">
+            <h3>Pilih Opsi Game Baru</h3>
+            <button id="new-profile-button">Profil Baru</button>
+            <button id="load-profile-button">Load Profil</button>
+            <button id="cancel-new-game-options">Batal</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Buat Profil Developer -->
+    <div id="create-profile-modal" class="modal">
+        <div class="modal-content">
+            <h3>Buat Profil Developer Baru</h3>
+            <input type="text" id="new-dev-name" placeholder="Nama Developer" required>
+            <input type="number" id="new-dev-age" placeholder="Usia" min="18" required>
+            <input type="number" id="new-dev-capital" placeholder="Modal Awal (min. 1000)" min="1000" required>
+            <button id="save-new-profile">Simpan Profil</button>
+            <button id="cancel-create-profile">Batal</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Detail Karakter Developer -->
+    <div id="developer-detail-modal" class="modal">
+        <div class="modal-content">
+            <h3>Detail Developer</h3>
+            <p>Nama: <span id="detail-dev-name"></span></p>
+            <p>Usia: <span id="detail-dev-age"></span></p>
+            <p>Saldo: Rp. <span id="detail-dev-capital"></span></p>
+            <p>Akumulasi Skor: <span id="detail-dev-score"></span></p>
+            <p>Waktu Bermain: <span id="detail-dev-playtime"></span> hari</p>
+            <button id="start-design-button">Desain</button>
+            <button id="delete-profile-button" class="action-button">Hapus Profil</button>
+            <button id="back-to-new-game-options">Kembali</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Load Profil Developer -->
+    <div id="load-profile-modal" class="modal">
+        <div class="modal-content">
+            <h3>Pilih Profil Developer</h3>
+            <div id="profile-list">
+                <!-- Daftar profil akan dimuat di sini oleh JS -->
+            </div>
+            <button id="cancel-load-profile">Batal</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Pemilihan Map (akan dipicu dari tombol Desain) -->
+    <div id="map-selection-modal" class="modal">
+        <div class="modal-content">
+            <h3>Pilih Ukuran Map</h3>
+            <button class="menu-button" data-size="9">Map 1 (9x9)</button>
+            <button class="menu-button" data-size="11">Map 2 (11x11)</button>
+            <button class="menu-button" data-size="13">Map 3 (13x13)</button>
+            <button id="cancel-map-selection">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        const welcomeMessageEl = document.getElementById('welcome-message');
+        const newGameButton = document.getElementById('new-game-button');
+
+        // Modals
+        const newGameOptionsModal = document.getElementById('new-game-options-modal');
+        const createProfileModal = document.getElementById('create-profile-modal');
+        const developerDetailModal = document.getElementById('developer-detail-modal');
+        const loadProfileModal = document.getElementById('load-profile-modal');
+        const mapSelectionModal = document.getElementById('map-selection-modal');
+
+        // Buttons in new game options modal
+        const newProfileButton = document.getElementById('new-profile-button');
+        const loadProfileButton = document.getElementById('load-profile-button');
+        const cancelNewGameOptions = document.getElementById('cancel-new-game-options');
+
+        // Elements in create profile modal
+        const newDevNameInput = document.getElementById('new-dev-name');
+        const newDevAgeInput = document.getElementById('new-dev-age');
+        const newDevCapitalInput = document.getElementById('new-dev-capital');
+        const saveNewProfileButton = document.getElementById('save-new-profile');
+        const cancelCreateProfileButton = document.getElementById('cancel-create-profile');
+
+        // Elements in developer detail modal
+        const detailDevNameEl = document.getElementById('detail-dev-name');
+        const detailDevAgeEl = document.getElementById('detail-dev-age');
+        const detailDevCapitalEl = document.getElementById('detail-dev-capital');
+        const startDesignButton = document.getElementById('start-design-button');
+        const deleteProfileButton = document.getElementById('delete-profile-button');
+
+        // ... (existing code)
+
+        // Delete Profile Button
+        deleteProfileButton.addEventListener('click', () => {
+            if (confirm('Apakah Anda yakin ingin menghapus profil ini? Aksi ini tidak dapat dibatalkan.')) {
+                let profiles = getDeveloperProfiles();
+                profiles.splice(activeDeveloperIndex, 1); // Remove the active profile
+                saveDeveloperProfiles(profiles);
+                localStorage.removeItem('activeDeveloperIndex'); // Clear active profile
+                activeDeveloperIndex = -1;
+                hideModal(developerDetailModal);
+                showModal(newGameOptionsModal);
+            }
+        });
+        const backToNewGameOptionsButton = document.getElementById('back-to-new-game-options');
+
+        // Elements in load profile modal
+        const profileListDiv = document.getElementById('profile-list');
+        const cancelLoadProfileButton = document.getElementById('cancel-load-profile');
+
+        // Elements in map selection modal
+        const cancelMapSelectionButton = document.getElementById('cancel-map-selection');
+
+        let activeDeveloperIndex = -1; // Index of the currently active developer profile
+
+        // --- Helper Functions ---
+        function showModal(modalElement) {
+            modalElement.style.display = 'flex';
+        }
+
+        function hideModal(modalElement) {
+            modalElement.style.display = 'none';
+        }
+
+        function getDeveloperProfiles() {
+            const profiles = localStorage.getItem('developerProfiles');
+            return profiles ? JSON.parse(profiles) : [];
+        }
+
+        function saveDeveloperProfiles(profiles) {
+            localStorage.setItem('developerProfiles', JSON.stringify(profiles));
+        }
+
+        function setActiveDeveloper(index) {
+            activeDeveloperIndex = index;
+            localStorage.setItem('activeDeveloperIndex', index);
+        }
+
+        function getActiveDeveloper() {
+            const profiles = getDeveloperProfiles();
+            const index = localStorage.getItem('activeDeveloperIndex');
+            if (index !== null && profiles[index]) {
+                return profiles[index];
+            }
+            return null;
+        }
+
+        function formatNumberWithThousandsSeparator(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = localStorage.getItem('username');
+            if (username) {
+                welcomeMessageEl.textContent = `Selamat Datang, ${username}!`;
+            } else {
+                window.location.href = 'index.html'; // Redirect to login if no user
+            }
+
+            // Check if we need to show developer detail after returning from game
+            const showDevDetailFlag = localStorage.getItem('showDeveloperDetail');
+            if (showDevDetailFlag === 'true') {
+                localStorage.removeItem('showDeveloperDetail'); // Clear the flag
+                const activeDev = getActiveDeveloper();
+                if (activeDev) {
+                    displayDeveloperDetail(activeDev);
+                    showModal(developerDetailModal);
+                }
+            }
+        });
+
+        // --- Event Listeners ---
+
+        // New Game Button (Main Menu)
+        newGameButton.addEventListener('click', () => {
+            showModal(newGameOptionsModal);
+        });
+
+        // New Game Options Modal Buttons
+        newProfileButton.addEventListener('click', () => {
+            hideModal(newGameOptionsModal);
+            newDevNameInput.value = '';
+            newDevAgeInput.value = '';
+            newDevCapitalInput.value = '';
+            showModal(createProfileModal);
+        });
+
+        loadProfileButton.addEventListener('click', () => {
+            hideModal(newGameOptionsModal);
+            loadDeveloperProfiles();
+            showModal(loadProfileModal);
+        });
+
+        cancelNewGameOptions.addEventListener('click', () => {
+            hideModal(newGameOptionsModal);
+        });
+
+        // Create Profile Modal Buttons
+        saveNewProfileButton.addEventListener('click', () => {
+            const name = newDevNameInput.value.trim();
+            const age = parseInt(newDevAgeInput.value);
+            const capital = parseInt(newDevCapitalInput.value);
+
+            if (!name) {
+                alert('Nama developer tidak boleh kosong.');
+                return;
+            }
+            if (isNaN(age) || age < 18) {
+                alert('Usia harus berupa angka dan minimal 18.');
+                return;
+            }
+            if (isNaN(capital) || capital < 1000) {
+                alert('Modal awal harus berupa angka dan minimal 1000.');
+                return;
+            }
+
+            const profiles = getDeveloperProfiles();
+            const newProfile = { name, age, capital, totalScore: 0, totalPlayTime: 0 };
+            profiles.push(newProfile);
+            saveDeveloperProfiles(profiles);
+            setActiveDeveloper(profiles.length - 1); // Set the newly created profile as active
+
+            hideModal(createProfileModal);
+            displayDeveloperDetail(newProfile);
+            showModal(developerDetailModal);
+        });
+
+        cancelCreateProfileButton.addEventListener('click', () => {
+            hideModal(createProfileModal);
+            showModal(newGameOptionsModal); // Go back to new game options
+        });
+
+        // Developer Detail Modal Buttons
+        startDesignButton.addEventListener('click', () => {
+            hideModal(developerDetailModal);
+            // Trigger map selection from here
+            showModal(mapSelectionModal);
+        });
+
+        backToNewGameOptionsButton.addEventListener('click', () => {
+            hideModal(developerDetailModal);
+            showModal(newGameOptionsModal);
+        });
+
+        // Load Profile Modal Functions
+        function loadDeveloperProfiles() {
+            profileListDiv.innerHTML = ''; // Clear previous list
+            const profiles = getDeveloperProfiles();
+            if (profiles.length === 0) {
+                profileListDiv.innerHTML = '<p>Belum ada profil tersimpan.</p>';
+                return;
+            }
+
+            profiles.forEach((profile, index) => {
+                const profileButton = document.createElement('button');
+                profileButton.classList.add('menu-button');
+                profileButton.textContent = `${profile.name} (Usia: ${profile.age}, Saldo: Rp. ${formatNumberWithThousandsSeparator(profile.capital)})`;
+                profileButton.addEventListener('click', () => {
+                    setActiveDeveloper(index);
+                    hideModal(loadProfileModal);
+                    displayDeveloperDetail(profile);
+                    showModal(developerDetailModal);
+                });
+                profileListDiv.appendChild(profileButton);
+            });
+        }
+
+        cancelLoadProfileButton.addEventListener('click', () => {
+            hideModal(loadProfileModal);
+            showModal(newGameOptionsModal); // Go back to new game options
+        });
+
+        // Map Selection Modal Buttons
+        mapSelectionModal.querySelectorAll('.menu-button[data-size]').forEach(button => {
+            button.addEventListener('click', () => {
+                const gridSize = button.dataset.size;
+                hideModal(mapSelectionModal);
+                window.location.href = `game.html?size=${gridSize}`;
+            });
+        });
+
+        cancelMapSelectionButton.addEventListener('click', () => {
+            hideModal(mapSelectionModal);
+            const activeDev = getActiveDeveloper();
+            if (activeDev) {
+                displayDeveloperDetail(activeDev);
+                showModal(developerDetailModal);
+            } else {
+                showModal(newGameOptionsModal);
+            }
+        });
+
+        // Function to display developer details
+        function displayDeveloperDetail(profile) {
+            detailDevNameEl.textContent = profile.name;
+            detailDevAgeEl.textContent = profile.age;
+            detailDevCapitalEl.textContent = formatNumberWithThousandsSeparator(profile.capital);
+            document.getElementById('detail-dev-score').textContent = formatNumberWithThousandsSeparator(profile.totalScore || 0);
+            document.getElementById('detail-dev-playtime').textContent = formatNumberWithThousandsSeparator(profile.totalPlayTime || 0);
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === newGameOptionsModal) hideModal(newGameOptionsModal);
+            if (event.target === createProfileModal) hideModal(createProfileModal);
+            if (event.target === developerDetailModal) hideModal(developerDetailModal);
+            if (event.target === loadProfileModal) hideModal(loadProfileModal);
+            if (event.target === mapSelectionModal) hideModal(mapSelectionModal);
+        });
+    </script>
+</body>
+</html>

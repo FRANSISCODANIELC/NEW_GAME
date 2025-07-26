@@ -1,0 +1,321 @@
+/* CSS Umum */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f8ff;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center the main container */
+    min-height: 100vh;
+    margin: 0;
+}
+
+#main-container {
+    display: flex;
+    flex-direction: column; /* Stack game and info panel vertically */
+    align-items: center; /* Center children horizontally */
+    gap: 20px;
+    border: 5px solid #0056b3; /* Border tetap */
+    padding: 20px; /* Tambahkan padding agar konten tidak terlalu mepet border */
+    border-radius: 15px; /* Sudut membulat untuk border */
+    max-width: 1000px; /* Batasi lebar maksimum */
+    max-height: 700px; /* Batasi tinggi maksimum */
+    box-sizing: border-box; /* Pastikan padding dan border termasuk dalam ukuran */
+}
+
+/* Halaman Game */
+#game-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch; /* Penting: agar tinggi grid-card dan info-panel sama */
+    gap: 20px;
+}
+
+#grid-card {
+    background-color: #ffffff;
+    padding: 20px; /* Padding agar grid tidak terlalu mepet */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex; /* Untuk memusatkan grid di dalamnya */
+    justify-content: center;
+    align-items: center;
+    max-width: 600px; /* Batasi lebar maksimum grid card */
+    max-height: 600px; /* Batasi tinggi maksimum grid card */
+    overflow: auto; /* Tambahkan scroll jika konten melebihi batas */
+    box-sizing: border-box; /* Pastikan padding dan border termasuk dalam ukuran */
+}
+
+#grid-container {
+    display: grid;
+    border: 3px solid #0056b3;
+}
+
+.grid-cell {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #add8e6;
+    box-sizing: border-box;
+    cursor: pointer;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+}
+
+.grid-cell:hover {
+    background-color: #e0f7fa;
+}
+
+/* Ikon di Grid */
+.fa-home { color: #c0392b; }
+.fa-tree { color: #27ae60; }
+.fa-mosque { color: #2980b9; }
+.fa-eraser { color: #e74c3c; }
+.fa-road { color: #333; } /* Warna default untuk ikon jalan */
+.fa-road.sekunder { color: #8B4513; } /* Warna cokelat untuk ikon jalan sekunder */
+
+/* Jalan sebagai blok hitam */
+.jalan-block-utama {
+    background-color: #333 !important;
+    width: 100%;
+    height: 100%;
+}
+
+.jalan-block-sekunder {
+    background-color: #8B4513 !important; /* Cokelat */
+    width: 100%;
+    height: 100%;
+}
+
+#info-panel {
+    width: 220px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex; /* Menggunakan flexbox untuk mengatur konten di dalamnya */
+    flex-direction: column;
+    justify-content: space-between; /* Untuk mendorong tombol aksi ke bawah */
+}
+
+#project-info-panel {
+    width: 840px; /* Lebar disesuaikan dengan total lebar grid-card + info-panel + gap */
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+#project-info-panel h3 {
+    margin-top: 0;
+    color: #0056b3;
+}
+
+#project-info-panel p {
+    display: inline-block;
+    margin: 0 15px;
+    font-size: 16px;
+}
+
+#info-panel h3 {
+    color: #0056b3;
+    border-bottom: 2px solid #f0f8ff;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+#building-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 10px;
+}
+
+#building-buttons button {
+    font-size: 24px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#building-buttons button:hover {
+    background-color: #e0e0e0;
+}
+
+#building-buttons button.selected {
+    background-color: #a2d2ff;
+    border-color: #007bff;
+}
+
+/* Tombol Aksi (Clear, Jual, Menu) */
+.action-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+
+#clear-button {
+    background-color: #dc3545;
+}
+
+#clear-button:hover {
+    background-color: #c82333;
+}
+
+#sell-button, #menu-button {
+    background-color: #007bff;
+}
+
+#sell-button:hover, #menu-button:hover {
+    background-color: #0056b3;
+}
+
+/* Pop-up */
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Gaya untuk ringkasan penjualan */
+#summary-popup .popup-content p {
+    margin-bottom: 5px;
+}
+
+#summary-modal { color: #ff8c00; } /* Orange */
+#summary-terjual { color: #800080; } /* Ungu */
+#summary-penjualan { color: #a0522d; } /* Cokelat */
+#summary-tidak-terjual, #summary-kerugian { color: #dc3545; } /* Merah */
+#summary-keuntungan { color: #28a745; } /* Hijau */
+#summary-waktu { color: #007bff; } /* Biru */
+#summary-score { color: #ffc107; } /* Kuning/Emas untuk skor */
+
+.popup-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Gaya untuk tombol menu di dalam pop-up (disalin dari login_style.css) */
+.popup-content .menu-button {
+    width: 200px; /* Lebar tetap untuk konsistensi */
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto 10px auto; /* Pusatkan tombol dan berikan margin bawah */
+    text-decoration: none;
+}
+
+.popup-content .menu-button:hover {
+    background-color: #0056b3;
+}
+
+.popup-content .menu-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Gaya untuk progress bar */
+.progress-bar-container {
+    width: 80%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    margin: 20px auto;
+    height: 25px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: #4CAF50; /* Green */
+    border-radius: 5px;
+    text-align: center;
+    line-height: 25px; /* Center text vertically */
+    color: white;
+    font-weight: bold;
+    transition: width 0.1s linear; /* Smooth transition for width */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #info-panel {
+        width: 100%;
+        max-width: 400px;
+        margin-top: 20px;
+    }
+
+    #project-info-panel {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    #dashboard-box, #login-box {
+        width: 90%;
+        padding: 20px;
+    }
+
+    #grid-container {
+        grid-template-columns: repeat(9, 30px);
+        grid-template-rows: repeat(9, 30px);
+    }
+
+    .grid-cell {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+    }
+
+    #info-panel {
+        padding: 15px;
+    }
+
+    #building-buttons {
+        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+        gap: 5px;
+    }
+
+    #building-buttons button {
+        font-size: 20px;
+        padding: 10px;
+    }
+
+    .popup-content {
+        width: 90%;
+    }
+}

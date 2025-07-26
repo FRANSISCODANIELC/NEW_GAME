@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Kompleks Perumahan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="main-container">
+        <div id="game-container">
+            <div id="grid-card"> <!-- Card background untuk grid -->
+                <div id="grid-container"></div>
+            </div>
+
+            <div id="info-panel">
+                <h3>Pilih Bangunan</h3>
+                <div id="building-buttons">
+                    <button data-type="rumah" title="Rumah (Biaya: Rp. 50)"><i class="fas fa-home"></i></button>
+                    <button data-type="taman" title="Taman (Biaya: Rp. 5)"><i class="fas fa-tree"></i></button>
+                    <button data-type="jalan_utama" title="Jalan Utama (Biaya: Rp. 2)"><i class="fas fa-road"></i></button>
+                    <button data-type="jalan_sekunder" title="Jalan Sekunder (Biaya: Rp. 1)"><i class="fas fa-road sekunder"></i></button>
+                    <button data-type="mushollah" title="Mushollah (Biaya: Rp. 50)"><i class="fas fa-mosque"></i></button>
+                    <button data-type="eraser" title="Hapus Bangunan"><i class="fas fa-eraser"></i></button>
+                </div>
+                <hr>
+                <h3>Aksi</h3>
+                <button id="clear-button" class="action-button">Clear Desain</button>
+                <button id="sell-button" class="action-button">Jual</button>
+                <button id="menu-button" class="action-button">Menu</button>
+            </div>
+        </div>
+
+        <!-- Pop-up untuk menu -->
+        <div id="menu-popup" class="popup">
+            <div class="popup-content">
+                <h3>Menu</h3>
+                <button class="menu-button">Resume Game</button>
+                <button class="menu-button">Save (Segera Hadir)</button>
+                <button class="menu-button" onclick="window.location.href='map_selection.html'">New Game</button>
+                <button class="menu-button" id="rules-button">Aturan</button>
+                <button class="menu-button">Option (Segera Hadir)</button>
+                <button class="menu-button" onclick="window.location.href='dashboard.html'">Quit Map</button>
+                <button class="menu-button" onclick="window.location.href='index.html'">Exit</button>
+            </div>
+        </div>
+
+        <!-- Pop-up untuk ringkasan penjualan -->
+        <div id="summary-popup" class="popup">
+            <div class="popup-content">
+                <h3>Ringkasan Penjualan</h3>
+                <p>Total Modal: <span id="summary-modal"></span></p>
+                <p>Unit Terjual: <span id="summary-terjual"></span></p>
+                <p>Total Penjualan: <span id="summary-penjualan"></span></p>
+                <p>Unit Tidak Terjual: <span id="summary-tidak-terjual"></span></p>
+                <p>Kerugian: <span id="summary-kerugian"></span></p>
+                <p>Total Keuntungan: <span id="summary-keuntungan"></span></p>
+                <p>Waktu Penjualan: <span id="summary-waktu"></span> hari</p>
+                <p>Skor Keseluruhan: <span id="summary-score"></span></p>
+                <button id="close-summary" class="menu-button">Selesai</button>
+            </div>
+        </div>
+
+        <!-- Pop-up Loading Baru -->
+        <div id="loading-popup" class="popup">
+            <div class="popup-content">
+                <h3 id="loading-title">PROGRES PENJUALAN PROPERTY. TERJUAL: <span id="sold-units-count">0</span></h3>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+                <p id="progress-text">0 hari</p>
+                <button id="skip-button" class="action-button" style="margin-top: 15px;">Skip</button>
+            </div>
+        </div>
+
+        <!-- Pop-up Aturan -->
+        <div id="rules-popup" class="popup">
+            <div class="popup-content">
+                <h3>Aturan Permainan</h3>
+                <p><strong>Tujuan:</strong> Bangun kompleks perumahan yang menguntungkan.</p>
+                <p><strong>Cara Bermain:</strong></p>
+                <ul>
+                    <li>Pilih bangunan dari panel di kanan.</li>
+                    <li>Klik atau seret di grid untuk menempatkan bangunan.</li>
+                    <li><strong>Rumah:</strong> Sumber pendapatan utama. Harus terhubung ke jalan untuk bisa dijual.</li>
+                    <li><strong>Taman:</strong> Mengurangi waktu penjualan rumah di sekitarnya.</li>
+                    <li><strong>Jalan Utama (Hitam):</strong> Menghubungkan rumah ke jaringan jalan.</li>
+                    <li><strong>Jalan Sekunder (Cokelat):</strong> Menghubungkan ke jalan lain.</li>
+                    <li><strong>Mushollah:</strong> Mengurangi waktu penjualan rumah di sekitarnya. Harus terhubung ke jalan.</li>
+                    <li><strong>Penghapus:</strong> Untuk menghapus bangunan yang sudah ditempatkan.</li>
+                </ul>
+                <p><strong>Penjualan:</strong> Klik tombol "Jual" untuk memulai simulasi penjualan. Rumah yang terhubung ke jalan akan terjual.</p>
+                <p><strong>Skor:</strong> Dihitung berdasarkan keuntungan dikurangi penalti waktu penjualan.</p>
+                <button id="close-rules-popup" class="menu-button">Tutup</button>
+            </div>
+        </div>
+
+        <div id="project-info-panel">
+            <h3>Informasi Proyek</h3>
+            <p>Sisa Anggaran: Rp. <span id="sisa-anggaran">1000</span></p>
+            <p>Total Biaya: Rp. <span id="total-biaya">0</span></p>
+            <p>Total Keuntungan: Rp. <span id="total-keuntungan">0</span></p>
+            <hr>
+            <p><i class="fas fa-home" style="color: #c0392b;"></i> Rumah: <span id="count-rumah">0</span></p>
+            <p><i class="fas fa-tree" style="color: #27ae60;"></i> Taman: <span id="count-taman">0</span></p>
+            <p><i class="fas fa-mosque" style="color: #2980b9;"></i> Mushollah: <span id="count-mushollah">0</span></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
