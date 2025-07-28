@@ -281,7 +281,7 @@ body {
 }
 
 /* Penyesuaian grid size di script.js mungkin diperlukan agar pas dengan vmin */
-@media (max-width: 900px), (orientation: portrait) {
+@media (max-width: 768px) {
     #main-container {
         width: calc(100vh * 16 / 9); /* Hitung lebar berdasarkan tinggi viewport untuk 16:9 */
         height: 100vh; /* Ambil seluruh tinggi viewport */
@@ -299,6 +299,7 @@ body {
         height: 80%; /* Alokasikan 80% tinggi untuk area game utama */
         width: 100%;
         gap: 1vmin;
+        background-color: rgba(255, 0, 0, 0.3); /* DEBUG: Merah transparan */
     }
 
     #grid-card {
@@ -306,6 +307,7 @@ body {
         width: auto; /* Biarkan flex menentukan lebar */
         height: 100%; /* Ambil seluruh tinggi yang tersedia */
         padding: 1vmin;
+        background-color: rgba(0, 255, 0, 0.3); /* DEBUG: Hijau transparan */
     }
 
     #right-side-panels {
@@ -313,6 +315,7 @@ body {
         height: 100%; /* Ambil seluruh tinggi yang tersedia */
         width: auto; /* Biarkan flex menentukan lebar */
         gap: 1vmin;
+        background-color: rgba(0, 0, 255, 0.3); /* DEBUG: Biru transparan */
     }
 
     #info-panel {
