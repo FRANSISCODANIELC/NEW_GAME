@@ -103,13 +103,24 @@ function initGame() {
 
     function createGrid() {
         gridContainer.innerHTML = '';
-        // Ukuran sel sekarang diatur oleh CSS (vmin), jadi kita hanya perlu mengatur kolom grid
-        gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-        gridContainer.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+
+        // Hitung ukuran sel optimal
+        const gridCard = document.getElementById('grid-card');
+        const cardWidth = gridCard.clientWidth - (parseFloat(getComputedStyle(gridCard).paddingLeft) * 2); // Kurangi padding
+        const cardHeight = gridCard.clientHeight - (parseFloat(getComputedStyle(gridCard).paddingTop) * 2); // Kurangi padding
+
+        const cellSize = Math.floor(Math.min(cardWidth / gridSize, cardHeight / gridSize));
+
+        gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, ${cellSize}px)`;
+        gridContainer.style.gridTemplateRows = `repeat(${gridSize}, ${cellSize}px)`;
+        gridContainer.style.width = `${gridSize * cellSize}px`;
+        gridContainer.style.height = `${gridSize * cellSize}px`;
+
         for (let i = 0; i < gridSize * gridSize; i++) {
             const cell = document.createElement('div');
             cell.classList.add('grid-cell');
             cell.dataset.index = i;
+            cell.style.fontSize = `${cellSize * 0.6}px`; // Ukuran ikon proporsional dengan sel
             // Event listener untuk drag-and-drop
             cell.addEventListener('mousedown', (e) => handleMouseDown(e, cell));
             cell.addEventListener('mouseover', () => handleMouseOver(cell));
@@ -187,39 +198,62 @@ function initGame() {
 
         const { row, col } = getCoords(parseInt(cell.dataset.index));
 
-        // Jika sedang dalam mode pindah, batalkan pindah sebelumnya jika ada
-        if (isMoving) {
-            alert("Selesaikan atau batalkan pemindahan saat ini terlebih dahulu.");
-            return;
-        }
-        
-        if (!selectedTool) {
-            alert("Pilih bangunan atau alat terlebih dahulu.");
-            return;
-        }
-
         if (selectedTool === 'move') {
-            const type = gameGrid[row][col];
-            if (!type) {
-                // Tidak ada peringatan jika klik petak kosong dengan alat 'move'
-                return;
+            if (isMoving) { // Klik kedua: meletakkan bangunan
+                if (gameGrid[row][col]) { // Petak tujuan sudah terisi
+                    alert("Petak tujuan sudah terisi!");
+                    return; // Jangan letakkan, tetap dalam mode pindah
+                }
+                // Letakkan bangunan
+                const { type } = movingBuilding;
+                gameGrid[row][col] = type;
+                const item = itemInfo[type];
+                if (item.type === 'road') {
+                    cell.innerHTML = `<div class="${item.blockClass}"></div>`;
+                } else {
+                    cell.innerHTML = `<i class="fas ${item.icon}"></i>`;
+                }
+                cell.dataset.type = type;
+
+                // Reset status pindah
+                isMoving = false;
+                movingBuilding = null;
+                selectedTool = null; // Batalkan pilihan alat setelah pindah
+                const buttons = buildingButtonsContainer.querySelectorAll('button');
+                buttons.forEach(btn => btn.classList.remove('selected'));
+                gridContainer.style.cursor = 'pointer'; // Kembalikan kursor
+                updateInfoPanel();
+
+            } else { // Klik pertama: mengambil bangunan
+                const type = gameGrid[row][col];
+                if (!type) {
+                    // Tidak ada peringatan jika klik petak kosong dengan alat 'move'
+                    return;
+                }
+                if (type === 'rumah_mewah_part') {
+                    alert("Pindahkan Rumah Mewah dari ikon utamanya (kiri atas).");
+                    return;
+                }
+
+                isMoving = true; // Set status "diambil"
+                movingBuilding = { type, fromRow: row, fromCol: col }; // Simpan lokasi dan tipe asli
+
+                // Hapus sementara dari grid
+                gameGrid[row][col] = null;
+                cell.innerHTML = '';
+                cell.removeAttribute('data-type');
+                gridContainer.style.cursor = 'grabbing'; // Ubah kursor menjadi "menggenggam"
             }
-            if (type === 'rumah_mewah_part') {
-                alert("Pindahkan Rumah Mewah dari ikon utamanya (kiri atas).");
-                return;
+        } else { // Logika untuk alat lain (tempatkan, hapus, upgrade)
+            // Jika sedang dalam mode pindah (dari alat lain), batalkan pindah sebelumnya
+            if (isMoving) {
+                revertMove();
+                isMoving = false;
+                movingBuilding = null;
+                gridContainer.style.cursor = 'pointer';
             }
 
-            isMoving = true;
-            movingBuilding = { type, fromRow: row, fromCol: col };
-
-            // Hapus sementara dari grid
-            gameGrid[row][col] = null;
-            cell.innerHTML = '';
-            cell.removeAttribute('data-type');
-            gridContainer.style.cursor = 'grabbing'; // Ubah kursor
-        } else {
-            // Logika untuk menempatkan, menghapus, atau upgrade
-            isDragging = true;
+            isDragging = true; // Ini untuk penempatan berkelanjutan (misalnya, jalan)
             lastProcessedCell = cell;
 
             if (selectedTool === 'eraser') {
@@ -228,9 +262,7 @@ function initGame() {
                 upgradeBuilding(row, col);
             } else { // Menempatkan bangunan baru
                 if (gameGrid[row][col]) {
-                    if (isDragging) { // Hanya tampilkan alert pada klik awal
-                        alert("Petak ini sudah terisi. Gunakan penghapus untuk membersihkannya.");
-                    }
+                    alert("Petak ini sudah terisi. Gunakan penghapus untuk membersihkannya.");
                     isDragging = false; // Batalkan drag jika petak awal sudah terisi
                     return;
                 }
@@ -256,42 +288,14 @@ function initGame() {
         lastProcessedCell = cell;
     }
 
-    // Fungsi untuk mengakhiri aksi drag atau move
-    function handleMouseUp(e) {
-        gridContainer.style.cursor = 'pointer'; // Kembalikan kursor default
-
-        if (isMoving) {
-            const targetCell = e.target.closest('.grid-cell');
-            
-            // Jika dilepas di luar grid atau di petak yang terisi, batalkan
-            if (!targetCell || gameGrid[getCoords(parseInt(targetCell.dataset.index)).row][getCoords(parseInt(targetCell.dataset.index)).col]) {
-                if(targetCell) alert("Petak tujuan sudah terisi!");
-                revertMove();
-            } else {
-                // Selesaikan pemindahan
-                const { row: targetRow, col: targetCol } = getCoords(parseInt(targetCell.dataset.index));
-                const { type } = movingBuilding;
-                
-                gameGrid[targetRow][targetCol] = type;
-                const item = itemInfo[type];
-                if (item.type === 'road') {
-                    targetCell.innerHTML = `<div class="${item.blockClass}"></div>`;
-                } else {
-                    targetCell.innerHTML = `<i class="fas ${item.icon}"></i>`;
-                }
-                targetCell.dataset.type = type;
-            }
-            
-            // Reset status pindah
-            isMoving = false;
-            movingBuilding = null;
-            selectedTool = null;
-            const buttons = buildingButtonsContainer.querySelectorAll('button');
-            buttons.forEach(btn => btn.classList.remove('selected'));
-        }
-
+    // Fungsi untuk mengakhiri aksi drag (hanya untuk penempatan berkelanjutan)
+    function handleMouseUp() {
         isDragging = false;
         lastProcessedCell = null;
+        // Kursor direset di handleMouseDown untuk alat 'move' atau di selectTool jika dibatalkan
+        if (!isMoving) { 
+            gridContainer.style.cursor = 'pointer';
+        }
     }
 
     function placeBuilding(cell, row, col) {
@@ -464,6 +468,14 @@ function initGame() {
     }
 
     function selectTool(type, button) {
+        // Jika ada bangunan yang sedang dipindahkan, kembalikan ke posisi semula
+        if (isMoving) {
+            revertMove();
+            isMoving = false;
+            movingBuilding = null;
+            gridContainer.style.cursor = 'pointer';
+        }
+
         selectedTool = type;
         const buttons = buildingButtonsContainer.querySelectorAll('button');
         buttons.forEach(btn => btn.classList.remove('selected'));

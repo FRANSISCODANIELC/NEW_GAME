@@ -64,8 +64,6 @@ body {
 }
 
 .grid-cell {
-    width: 4.5vmin;
-    height: 4.5vmin;
     border: 0.1vmin solid #add8e6;
     box-sizing: border-box;
     cursor: pointer;
@@ -73,7 +71,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2.5vmin; /* Ukuran ikon responsif */
 }
 
 .grid-cell:hover {
@@ -304,8 +301,6 @@ body {
     }
 
     .grid-cell {
-        width: 8vw; /* Gunakan vw untuk ukuran sel agar skala dengan lebar layar */
-        height: 8vw;
         font-size: 4vw; /* Skala ukuran ikon dengan lebar layar */
     }
 
