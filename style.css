@@ -281,7 +281,7 @@ body {
 }
 
 /* Penyesuaian grid size di script.js mungkin diperlukan agar pas dengan vmin */
-@media (max-width: 768px) {
+@media (max-width: 900px), (orientation: portrait) {
     #main-container {
         width: calc(100vh * 16 / 9); /* Hitung lebar berdasarkan tinggi viewport untuk 16:9 */
         height: 100vh; /* Ambil seluruh tinggi viewport */
@@ -332,27 +332,31 @@ body {
 
     #project-info-panel p {
         margin: 0.1vmin 0.1vmin;
-        font-size: 1.2vmin; /* Ukuran font lebih kecil */
+        font-size: 1.5vmin; /* Ukuran font lebih kecil */
     }
 
     #info-panel h3, #project-info-panel h3 {
         font-size: 1.5vmin; /* Ukuran font lebih kecil */
     }
     #building-buttons {
-        grid-template-columns: repeat(auto-fit, minmax(2vmin, 1fr)); /* Lebih kecil lagi */
-        gap: 0.1vmin; /* Jarak lebih kecil lagi */
+        grid-template-columns: repeat(auto-fit, minmax(4vmin, 1fr)); /* Ukuran tombol lebih besar untuk debugging */
+        gap: 0.5vmin; /* Jarak lebih besar untuk debugging */
     }
     #building-buttons button {
-        font-size: 1.5vmin; /* Ukuran font lebih kecil */
-        padding: 0.5vmin; /* Padding lebih kecil */
+        font-size: 3vmin; /* Ukuran font lebih besar untuk debugging */
+        padding: 1.5vmin; /* Padding lebih besar untuk debugging */
+        border: 1px solid red; /* DEBUG: Border merah */
+        z-index: 9999; /* Pastikan di atas */
     }
     .info-box {
-        font-size: 1.5vmin; /* Ukuran font lebih kecil */
-        min-height: 5vmin; /* Tinggi minimum lebih kecil */
+        font-size: 1.8vmin; /* Ukuran font lebih besar untuk debugging */
+        min-height: 8vmin; /* Tinggi minimum lebih besar untuk debugging */
     }
     .action-button {
-        font-size: 1.5vmin; /* Ukuran font lebih kecil */
-        padding: 0.8vmin; /* Padding lebih kecil */
+        font-size: 2vmin; /* Ukuran font lebih besar untuk debugging */
+        padding: 1.2vmin; /* Padding lebih besar untuk debugging */
+        border: 1px solid blue; /* DEBUG: Border biru */
+        z-index: 9999; /* Pastikan di atas */
     }
     .popup-content {
         font-size: 2.2vmin;
