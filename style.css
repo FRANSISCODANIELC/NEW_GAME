@@ -334,9 +334,13 @@ body {
     #info-panel h3, #project-info-panel h3 {
         font-size: 3vmin;
     }
+    #building-buttons {
+        grid-template-columns: repeat(auto-fit, minmax(4vmin, 1fr)); /* Lebih kecil */
+        gap: 0.5vmin; /* Jarak lebih kecil */
+    }
     #building-buttons button {
-        font-size: 4vmin;
-        padding: 2vmin;
+        font-size: 3vmin; /* Ukuran font lebih kecil */
+        padding: 1.5vmin; /* Padding lebih kecil */
     }
     .info-box {
         font-size: 2.5vmin;
