@@ -276,28 +276,27 @@ body {
 /* Penyesuaian grid size di script.js mungkin diperlukan agar pas dengan vmin */
 @media (max-width: 900px), (orientation: portrait) {
     #main-container {
-        width: calc(100vh * 16 / 9); /* Hitung lebar berdasarkan tinggi viewport untuk 16:9 */
-        height: 100vh; /* Ambil seluruh tinggi viewport */
-        max-width: 100vw; /* Batasi lebar agar tidak melebihi lebar viewport */
-        max-height: calc(100vw * 9 / 16); /* Batasi tinggi agar tidak melebihi rasio 16:9 dari lebar viewport */
-        margin: auto; /* Pusatkan */
+        width: 98vw; /* Ambil hampir seluruh lebar viewport */
+        height: 98vh; /* Ambil hampir seluruh tinggi viewport */
+        max-width: none; /* Hapus batasan rasio aspek tetap */
+        max-height: none; /* Hapus batasan rasio aspek tetap */
         padding: 1vmin; /* Padding lebih kecil untuk mobile */
-        overflow: hidden; /* Sembunyikan overflow, letterboxing akan menangani sisa ruang */
+        overflow-y: auto; /* Izinkan scroll jika konten meluap secara vertikal */
         flex-direction: column; /* Susun elemen utama secara vertikal */
         justify-content: flex-start; /* Sejajarkan item ke awal */
     }
 
     #game-container {
         flex-direction: column; /* Susun grid dan panel info secara vertikal */
-        height: 60%; /* Alokasikan 60% tinggi untuk area game utama di mobile */
+        height: auto; /* Biarkan konten menentukan tinggi */
         width: 100%;
-        gap: 1vmin;
+        gap: 1vmin; /* Jarak lebih kecil */
     }
 
     #grid-card {
-        flex: 1; /* Biarkan grid-card mengambil ruang yang tersedia */
+        flex: none; /* Hapus ukuran flex */
         width: 100%;
-        height: auto; /* Biarkan tinggi ditentukan oleh flex */
+        height: auto;
         padding: 1vmin;
     }
 
