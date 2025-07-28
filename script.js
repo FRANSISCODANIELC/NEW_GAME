@@ -104,17 +104,27 @@ function initGame() {
     function createGrid() {
         gridContainer.innerHTML = '';
 
-        // Hitung ukuran sel optimal
-        const gridCard = document.getElementById('grid-card');
-        const cardWidth = gridCard.clientWidth - (parseFloat(getComputedStyle(gridCard).paddingLeft) * 2); // Kurangi padding
-        const cardHeight = gridCard.clientHeight - (parseFloat(getComputedStyle(gridCard).paddingTop) * 2); // Kurangi padding
+        // Dapatkan ukuran main-container yang sudah diskalakan 16:9
+        const mainContainer = document.getElementById('main-container');
+        const mainContainerWidth = mainContainer.clientWidth;
+        const mainContainerHeight = mainContainer.clientHeight;
 
-        const cellSize = Math.floor(Math.min(cardWidth / gridSize, cardHeight / gridSize));
+        // Alokasikan sebagian ruang untuk grid (misalnya 70% dari tinggi main-container)
+        const availableHeightForGrid = mainContainerHeight * 0.7; 
+        const availableWidthForGrid = mainContainerWidth * 0.7; // Sesuaikan jika perlu
+
+        // Hitung ukuran sel optimal berdasarkan ruang yang dialokasikan
+        const cellSize = Math.floor(Math.min(availableWidthForGrid / gridSize, availableHeightForGrid / gridSize));
 
         gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, ${cellSize}px)`;
         gridContainer.style.gridTemplateRows = `repeat(${gridSize}, ${cellSize}px)`;
         gridContainer.style.width = `${gridSize * cellSize}px`;
         gridContainer.style.height = `${gridSize * cellSize}px`;
+
+        // Pastikan grid tidak melebihi grid-card
+        const gridCard = document.getElementById('grid-card');
+        gridCard.style.maxWidth = `${gridSize * cellSize}px`;
+        gridCard.style.maxHeight = `${gridSize * cellSize}px`;
 
         for (let i = 0; i < gridSize * gridSize; i++) {
             const cell = document.createElement('div');
@@ -124,7 +134,6 @@ function initGame() {
             // Event listener untuk drag-and-drop
             cell.addEventListener('mousedown', (e) => handleMouseDown(e, cell));
             cell.addEventListener('mouseover', () => handleMouseOver(cell));
-            cell.addEventListener('touchstart', (e) => handleTouchStart(e, cell));
             gridContainer.appendChild(cell);
         }
     }

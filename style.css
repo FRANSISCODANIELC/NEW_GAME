@@ -289,15 +289,15 @@ body {
 
     #game-container {
         flex-direction: column; /* Susun grid dan panel info secara vertikal */
-        height: 60%; /* Alokasikan 60% tinggi untuk area game utama di mobile */
+        height: auto; /* Biarkan konten menentukan tinggi */
         width: 100%;
-        gap: 1vmin;
+        gap: 1vmin; /* Jarak lebih kecil */
     }
 
     #grid-card {
-        flex: 1; /* Biarkan grid-card mengambil ruang yang tersedia */
+        flex: none; /* Hapus ukuran flex */
         width: 100%;
-        height: auto; /* Biarkan tinggi ditentukan oleh flex */
+        height: auto;
         padding: 1vmin;
     }
 
