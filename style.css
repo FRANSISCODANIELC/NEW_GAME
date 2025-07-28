@@ -277,6 +277,88 @@ body {
 }
 
 /* Penyesuaian grid size di script.js mungkin diperlukan agar pas dengan vmin */
-@media (max-width: 768px) {
-    /* Aturan di sini mungkin tidak lagi diperlukan karena penskalaan vmin/vmax */
+@media (max-width: 900px), (orientation: portrait) {
+    #main-container {
+        width: 98vw; /* Ambil hampir seluruh lebar viewport */
+        height: 98vh; /* Ambil hampir seluruh tinggi viewport */
+        max-width: none; /* Hapus batasan rasio aspek tetap */
+        max-height: none; /* Hapus batasan rasio aspek tetap */
+        padding: 1vmin; /* Padding lebih kecil untuk mobile */
+        overflow-y: auto; /* Izinkan scroll jika konten meluap secara vertikal */
+        flex-direction: column; /* Susun elemen utama secara vertikal */
+        justify-content: flex-start; /* Sejajarkan item ke awal */
+    }
+
+    #game-container {
+        flex-direction: column; /* Susun grid dan panel info secara vertikal */
+        height: auto; /* Biarkan konten menentukan tinggi */
+        width: 100%;
+        gap: 1vmin; /* Jarak lebih kecil */
+    }
+
+    #grid-card {
+        flex: none; /* Hapus ukuran flex */
+        width: 100%;
+        height: auto;
+        padding: 1vmin;
+    }
+
+    .grid-cell {
+        width: 8vw; /* Gunakan vw untuk ukuran sel agar skala dengan lebar layar */
+        height: 8vw;
+        font-size: 4vw; /* Skala ukuran ikon dengan lebar layar */
+    }
+
+    #info-panel {
+        flex: none; /* Hapus ukuran flex */
+        width: 100%;
+        height: auto;
+        padding: 1vmin;
+        margin-top: 1vmin;
+    }
+
+    #project-info-panel {
+        width: 100%;
+        height: auto;
+        padding: 1vmin;
+        margin-top: 1vmin;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #project-info-panel p {
+        margin: 0.5vmin 1vmin;
+        font-size: 2vmin;
+    }
+
+    #info-panel h3, #project-info-panel h3 {
+        font-size: 3vmin;
+    }
+    #building-buttons button {
+        font-size: 4vmin;
+        padding: 2vmin;
+    }
+    .info-box {
+        font-size: 2.5vmin;
+        min-height: 12vmin;
+    }
+    .action-button {
+        font-size: 2.5vmin;
+        padding: 1.8vmin;
+    }
+    .popup-content {
+        max-width: 90vw;
+        font-size: 3vmin;
+    }
+    .popup-content h3 {
+        font-size: 4vmin;
+    }
+    .popup-content .menu-button {
+        width: 80%;
+        font-size: 3vmin;
+        padding: 2.5vmin;
+    }
+    .progress-bar-container {
+        height: 5vmin;
+    }
 }

@@ -26,6 +26,7 @@ function initGame() {
     const rulesButton = document.getElementById('rules-button');
     const rulesPopup = document.getElementById('rules-popup');
     const closeRulesPopup = document.getElementById('close-rules-popup');
+    const fullscreenButton = document.getElementById('fullscreen-button');
     const buildingInfoPanel = document.getElementById('building-info-panel');
 
     // Elemen untuk menampilkan jumlah bangunan
@@ -664,6 +665,22 @@ function initGame() {
 
     if (closeRulesPopup) {
         closeRulesPopup.addEventListener('click', () => hidePopup(rulesPopup));
+    }
+
+    if (fullscreenButton) {
+        fullscreenButton.addEventListener('click', toggleFullscreen);
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
     }
 
     const resumeGameButton = menuPopup.querySelector('button');
