@@ -299,15 +299,13 @@ body {
         height: 80%; /* Alokasikan 80% tinggi untuk area game utama */
         width: 100%;
         gap: 1vmin;
-        background-color: rgba(255, 0, 0, 0.3); /* DEBUG: Merah transparan */
     }
 
     #grid-card {
-        flex: 7; /* Grid mengambil porsi lebih besar */
+        flex: 15; /* Grid mengambil porsi lebih besar */
         width: auto; /* Biarkan flex menentukan lebar */
         height: 100%; /* Ambil seluruh tinggi yang tersedia */
         padding: 1vmin;
-        background-color: rgba(0, 255, 0, 0.3); /* DEBUG: Hijau transparan */
     }
 
     #right-side-panels {
@@ -315,47 +313,46 @@ body {
         height: 100%; /* Ambil seluruh tinggi yang tersedia */
         width: auto; /* Biarkan flex menentukan lebar */
         gap: 1vmin;
-        background-color: rgba(0, 0, 255, 0.3); /* DEBUG: Biru transparan */
     }
 
     #info-panel {
         flex: 2; /* Panel info mengambil porsi lebih besar dari panel proyek */
         height: auto;
-        padding: 0.8vmin; /* Padding lebih kecil */
+        padding: 0.5vmin; /* Padding lebih kecil */
         margin-top: 0; /* Reset margin-top */
     }
 
     #project-info-panel {
         flex: 1; /* Panel info proyek mengambil porsi lebih kecil */
         height: auto;
-        padding: 0.8vmin; /* Padding lebih kecil */
+        padding: 0.5vmin; /* Padding lebih kecil */
         margin-top: 0; /* Reset margin-top */
         flex-wrap: nowrap; /* Jangan wrap di mobile */
     }
 
     #project-info-panel p {
-        margin: 0.1vmin 0.2vmin;
-        font-size: 1.5vmin; /* Ukuran font lebih kecil */
+        margin: 0.1vmin 0.1vmin;
+        font-size: 1.2vmin; /* Ukuran font lebih kecil */
     }
 
     #info-panel h3, #project-info-panel h3 {
-        font-size: 1.8vmin; /* Ukuran font lebih kecil */
+        font-size: 1.5vmin; /* Ukuran font lebih kecil */
     }
     #building-buttons {
-        grid-template-columns: repeat(auto-fit, minmax(2.5vmin, 1fr)); /* Lebih kecil lagi */
-        gap: 0.2vmin; /* Jarak lebih kecil lagi */
+        grid-template-columns: repeat(auto-fit, minmax(2vmin, 1fr)); /* Lebih kecil lagi */
+        gap: 0.1vmin; /* Jarak lebih kecil lagi */
     }
     #building-buttons button {
-        font-size: 2vmin; /* Ukuran font lebih kecil */
-        padding: 0.8vmin; /* Padding lebih kecil */
+        font-size: 1.5vmin; /* Ukuran font lebih kecil */
+        padding: 0.5vmin; /* Padding lebih kecil */
     }
     .info-box {
-        font-size: 1.8vmin; /* Ukuran font lebih kecil */
-        min-height: 6vmin; /* Tinggi minimum lebih kecil */
+        font-size: 1.5vmin; /* Ukuran font lebih kecil */
+        min-height: 5vmin; /* Tinggi minimum lebih kecil */
     }
     .action-button {
-        font-size: 1.8vmin; /* Ukuran font lebih kecil */
-        padding: 1vmin; /* Padding lebih kecil */
+        font-size: 1.5vmin; /* Ukuran font lebih kecil */
+        padding: 0.8vmin; /* Padding lebih kecil */
     }
     .popup-content {
         font-size: 2.2vmin;
