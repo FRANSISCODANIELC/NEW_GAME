@@ -46,6 +46,13 @@ body {
     height: 80%; /* Alokasikan 80% tinggi untuk area game utama */
 }
 
+#right-side-panels {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Mengambil sisa ruang */
+    gap: 2vmin;
+}
+
 #grid-card {
     background-color: #ffffff;
     border-radius: 1.5vmin;
@@ -109,13 +116,13 @@ body {
 }
 
 #project-info-panel {
-    width: 100%;
-    height: 15%; /* Alokasikan 15% tinggi untuk info proyek */
+    flex: 1; /* Panel info proyek mengambil porsi lebih kecil */
     padding: 1.5vmin;
     background-color: #ffffff;
     border-radius: 1.5vmin;
     box-shadow: 0 0.5vmin 1vmin rgba(0,0,0,0.1);
     display: flex;
+    flex-direction: column;
     justify-content: space-around;
     align-items: center;
     font-size: 1.6vmin;
@@ -288,47 +295,48 @@ body {
     }
 
     #game-container {
-        flex-direction: column; /* Susun grid dan panel info secara vertikal */
-        height: auto; /* Biarkan konten menentukan tinggi */
+        flex-direction: row; /* Susun grid dan panel info secara horizontal di mobile */
+        height: 80%; /* Alokasikan 80% tinggi untuk area game utama */
         width: 100%;
-        gap: 1vmin; /* Jarak lebih kecil */
+        gap: 1vmin;
     }
 
     #grid-card {
-        flex: none; /* Hapus ukuran flex */
-        width: 100%;
-        height: auto;
+        flex: 3; /* Grid mengambil porsi lebih besar */
+        width: auto; /* Biarkan flex menentukan lebar */
+        height: 100%; /* Ambil seluruh tinggi yang tersedia */
         padding: 1vmin;
     }
 
-    .grid-cell {
-        font-size: 4vw; /* Skala ukuran ikon dengan lebar layar */
+    #right-side-panels {
+        flex: 1; /* Panel kanan mengambil porsi lebih kecil */
+        height: 100%; /* Ambil seluruh tinggi yang tersedia */
+        width: auto; /* Biarkan flex menentukan lebar */
+        gap: 1vmin;
     }
 
     #info-panel {
-        flex: none; /* Hapus ukuran flex */
-        width: 100%;
+        flex: 2; /* Panel info mengambil porsi lebih besar dari panel proyek */
         height: auto;
         padding: 1vmin;
-        margin-top: 1vmin;
+        margin-top: 0; /* Reset margin-top */
     }
 
     #project-info-panel {
-        width: 100%;
+        flex: 1; /* Panel info proyek mengambil porsi lebih kecil */
         height: auto;
         padding: 1vmin;
-        margin-top: 1vmin;
-        flex-wrap: wrap;
-        justify-content: center;
+        margin-top: 0; /* Reset margin-top */
+        flex-wrap: nowrap; /* Jangan wrap di mobile */
     }
 
     #project-info-panel p {
-        margin: 0.5vmin 1vmin;
-        font-size: 2vmin;
+        margin: 0.2vmin 0.5vmin;
+        font-size: 1.8vmin;
     }
 
     #info-panel h3, #project-info-panel h3 {
-        font-size: 3vmin;
+        font-size: 2.2vmin;
     }
     #building-buttons {
         grid-template-columns: repeat(auto-fit, minmax(3vmin, 1fr)); /* Even smaller */
@@ -345,9 +353,6 @@ body {
     .action-button {
         font-size: 2vmin;
         padding: 1.2vmin;
-    }
-    #info-panel h3, #project-info-panel h3 {
-        font-size: 2.5vmin;
     }
     .popup-content {
         font-size: 2.2vmin;
