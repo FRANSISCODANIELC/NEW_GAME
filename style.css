@@ -302,7 +302,7 @@ body {
     }
 
     #grid-card {
-        flex: 3; /* Grid mengambil porsi lebih besar */
+        flex: 7; /* Grid mengambil porsi lebih besar */
         width: auto; /* Biarkan flex menentukan lebar */
         height: 100%; /* Ambil seluruh tinggi yang tersedia */
         padding: 1vmin;
@@ -318,41 +318,41 @@ body {
     #info-panel {
         flex: 2; /* Panel info mengambil porsi lebih besar dari panel proyek */
         height: auto;
-        padding: 1vmin;
+        padding: 0.8vmin; /* Padding lebih kecil */
         margin-top: 0; /* Reset margin-top */
     }
 
     #project-info-panel {
         flex: 1; /* Panel info proyek mengambil porsi lebih kecil */
         height: auto;
-        padding: 1vmin;
+        padding: 0.8vmin; /* Padding lebih kecil */
         margin-top: 0; /* Reset margin-top */
         flex-wrap: nowrap; /* Jangan wrap di mobile */
     }
 
     #project-info-panel p {
-        margin: 0.2vmin 0.5vmin;
-        font-size: 1.8vmin;
+        margin: 0.1vmin 0.2vmin;
+        font-size: 1.5vmin; /* Ukuran font lebih kecil */
     }
 
     #info-panel h3, #project-info-panel h3 {
-        font-size: 2.2vmin;
+        font-size: 1.8vmin; /* Ukuran font lebih kecil */
     }
     #building-buttons {
-        grid-template-columns: repeat(auto-fit, minmax(3vmin, 1fr)); /* Even smaller */
-        gap: 0.3vmin; /* Even smaller gap */
+        grid-template-columns: repeat(auto-fit, minmax(2.5vmin, 1fr)); /* Lebih kecil lagi */
+        gap: 0.2vmin; /* Jarak lebih kecil lagi */
     }
     #building-buttons button {
-        font-size: 2.5vmin; /* Smaller font size */
-        padding: 1vmin; /* Smaller padding */
+        font-size: 2vmin; /* Ukuran font lebih kecil */
+        padding: 0.8vmin; /* Padding lebih kecil */
     }
     .info-box {
-        font-size: 2vmin;
-        min-height: 8vmin; /* Reduced min-height */
+        font-size: 1.8vmin; /* Ukuran font lebih kecil */
+        min-height: 6vmin; /* Tinggi minimum lebih kecil */
     }
     .action-button {
-        font-size: 2vmin;
-        padding: 1.2vmin;
+        font-size: 1.8vmin; /* Ukuran font lebih kecil */
+        padding: 1vmin; /* Padding lebih kecil */
     }
     .popup-content {
         font-size: 2.2vmin;
