@@ -276,12 +276,13 @@ body {
 /* Penyesuaian grid size di script.js mungkin diperlukan agar pas dengan vmin */
 @media (max-width: 900px), (orientation: portrait) {
     #main-container {
-        width: 98vw; /* Ambil hampir seluruh lebar viewport */
-        height: 98vh; /* Ambil hampir seluruh tinggi viewport */
-        max-width: none; /* Hapus batasan rasio aspek tetap */
-        max-height: none; /* Hapus batasan rasio aspek tetap */
+        width: calc(100vh * 16 / 9); /* Hitung lebar berdasarkan tinggi viewport untuk 16:9 */
+        height: 100vh; /* Ambil seluruh tinggi viewport */
+        max-width: 100vw; /* Batasi lebar agar tidak melebihi lebar viewport */
+        max-height: calc(100vw * 9 / 16); /* Batasi tinggi agar tidak melebihi rasio 16:9 dari lebar viewport */
+        margin: auto; /* Pusatkan */
         padding: 1vmin; /* Padding lebih kecil untuk mobile */
-        overflow-y: auto; /* Izinkan scroll jika konten meluap secara vertikal */
+        overflow: hidden; /* Sembunyikan overflow, letterboxing akan menangani sisa ruang */
         flex-direction: column; /* Susun elemen utama secara vertikal */
         justify-content: flex-start; /* Sejajarkan item ke awal */
     }
@@ -330,20 +331,33 @@ body {
         font-size: 3vmin;
     }
     #building-buttons {
-        grid-template-columns: repeat(auto-fit, minmax(4vmin, 1fr)); /* Lebih kecil */
-        gap: 0.5vmin; /* Jarak lebih kecil */
+        grid-template-columns: repeat(auto-fit, minmax(3vmin, 1fr)); /* Even smaller */
+        gap: 0.3vmin; /* Even smaller gap */
     }
     #building-buttons button {
-        font-size: 3vmin; /* Ukuran font lebih kecil */
-        padding: 1.5vmin; /* Padding lebih kecil */
+        font-size: 2.5vmin; /* Smaller font size */
+        padding: 1vmin; /* Smaller padding */
     }
     .info-box {
-        font-size: 2.5vmin;
-        min-height: 12vmin;
+        font-size: 2vmin;
+        min-height: 8vmin; /* Reduced min-height */
     }
     .action-button {
+        font-size: 2vmin;
+        padding: 1.2vmin;
+    }
+    #info-panel h3, #project-info-panel h3 {
         font-size: 2.5vmin;
-        padding: 1.8vmin;
+    }
+    .popup-content {
+        font-size: 2.2vmin;
+    }
+    .popup-content h3 {
+        font-size: 3vmin;
+    }
+    .popup-content .menu-button {
+        font-size: 2.2vmin;
+        padding: 1.5vmin;
     }
     .popup-content {
         max-width: 90vw;

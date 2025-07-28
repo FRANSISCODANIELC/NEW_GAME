@@ -124,7 +124,40 @@ function initGame() {
             // Event listener untuk drag-and-drop
             cell.addEventListener('mousedown', (e) => handleMouseDown(e, cell));
             cell.addEventListener('mouseover', () => handleMouseOver(cell));
+            cell.addEventListener('touchstart', (e) => handleTouchStart(e, cell));
             gridContainer.appendChild(cell);
+        }
+    }
+
+    // Helper untuk mendapatkan sel dari event sentuh
+    function getCellFromTouchEvent(e) {
+        const touch = e.touches[0] || e.changedTouches[0];
+        return document.elementFromPoint(touch.clientX, touch.clientY);
+    }
+
+    // Handler untuk touchstart
+    function handleTouchStart(e, cell) {
+        e.preventDefault(); // Mencegah scrolling dan zoom default browser
+        handleMouseDown({ button: 0, target: cell }, cell); // Simulasikan klik kiri mouse
+    }
+
+    // Handler untuk touchmove
+    function handleTouchMove(e) {
+        e.preventDefault();
+        const cell = getCellFromTouchEvent(e);
+        if (cell && cell.classList.contains('grid-cell')) {
+            handleMouseOver(cell);
+        }
+    }
+
+    // Handler untuk touchend
+    function handleTouchEnd(e) {
+        e.preventDefault();
+        const cell = getCellFromTouchEvent(e);
+        if (cell && cell.classList.contains('grid-cell')) {
+            handleMouseUp({ target: cell }); // Simulasikan mouseup pada sel
+        } else { // Jika dilepas di luar grid
+            handleMouseUp({ target: null });
         }
     }
 
@@ -707,6 +740,8 @@ function initGame() {
     });
 
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchmove', handleTouchMove);
 
     resetGame();
 }
