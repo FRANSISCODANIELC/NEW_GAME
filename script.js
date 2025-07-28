@@ -26,9 +26,11 @@ function initGame() {
     const rulesButton = document.getElementById('rules-button');
     const rulesPopup = document.getElementById('rules-popup');
     const closeRulesPopup = document.getElementById('close-rules-popup');
+    const buildingInfoPanel = document.getElementById('building-info-panel');
 
     // Elemen untuk menampilkan jumlah bangunan
     const countRumahEl = document.getElementById('count-rumah');
+    const countRumahMewahEl = document.getElementById('count-rumah-mewah');
     const countTamanEl = document.getElementById('count-taman');
     const countMushollahEl = document.getElementById('count-mushollah');
 
@@ -53,7 +55,9 @@ function initGame() {
 
     let sisaAnggaran, totalBiaya, totalKeuntungan, selectedTool, jumlahRumah;
     let gameGrid = []; // Representasi internal grid
-    let buildingCounts = { rumah: 0, taman: 0, mushollah: 0 }; // Penghitung bangunan
+    let buildingCounts = { rumah: 0, taman: 0, mushollah: 0, rumah_mewah: 0 }; // Penghitung bangunan
+    let isMoving = false; // Status untuk fitur pindah
+    let movingBuilding = null; // Info bangunan yang akan dipindah
 
     // Variabel untuk fitur drag-and-drop
     let isDragging = false;
@@ -65,10 +69,13 @@ function initGame() {
 
     const itemInfo = {
         rumah: { biaya: 50, nilaiJual: 120, baseSellingTime: 30, icon: 'fa-home' }, // 30 hari standar
+        rumah_mewah: { biaya: 200, nilaiJual: 720, baseSellingTime: 60, icon: 'fa-building' }, // Biaya 4 rumah, Jual 6x
         taman: { biaya: 5, nilaiJual: 0, effectPercentage: 0.15, icon: 'fa-tree' }, // 15% pengurangan waktu
         jalan_utama: { biaya: 2, nilaiJual: 0, effectPercentage: 0.02, type: 'road', blockClass: 'jalan-block-utama' }, // 2% pengurangan waktu
         jalan_sekunder: { biaya: 1, nilaiJual: 0, effectPercentage: 0.01, type: 'road', blockClass: 'jalan-block-sekunder' }, // 1% pengurangan waktu
         mushollah: { biaya: 50, nilaiJual: 0, effectPercentage: 0.25, icon: 'fa-mosque' }, // 25% pengurangan waktu
+        upgrade: { biaya: 50 }, // Biaya upgrade seharga 1 rumah
+        move: { biaya: 0 },
         eraser: { biaya: 0 } // Eraser tidak memiliki biaya atau dampak
     };
 
@@ -82,7 +89,7 @@ function initGame() {
         totalKeuntungan = 0;
         selectedTool = null;
         jumlahRumah = 0;
-        buildingCounts = { rumah: 0, taman: 0, mushollah: 0 }; // Reset penghitung
+        buildingCounts = { rumah: 0, taman: 0, mushollah: 0, rumah_mewah: 0 }; // Reset penghitung
         
         // Inisialisasi gameGrid
         gameGrid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
@@ -95,14 +102,15 @@ function initGame() {
 
     function createGrid() {
         gridContainer.innerHTML = '';
-        gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 40px)`;
-        gridContainer.style.gridTemplateRows = `repeat(${gridSize}, 40px)`;
+        // Ukuran sel sekarang diatur oleh CSS (vmin), jadi kita hanya perlu mengatur kolom grid
+        gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+        gridContainer.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
         for (let i = 0; i < gridSize * gridSize; i++) {
             const cell = document.createElement('div');
             cell.classList.add('grid-cell');
             cell.dataset.index = i;
             // Event listener untuk drag-and-drop
-            cell.addEventListener('mousedown', (e) => { if (e.button === 0) handleMouseDown(e, cell); });
+            cell.addEventListener('mousedown', (e) => handleMouseDown(e, cell));
             cell.addEventListener('mouseover', () => handleMouseOver(cell));
             gridContainer.appendChild(cell);
         }
@@ -174,13 +182,60 @@ function initGame() {
 
     // Fungsi untuk memulai aksi (klik atau drag)
     function handleMouseDown(e, cell) {
-        if (!selectedTool) {
-            alert("Pilih bangunan atau penghapus terlebih dahulu.");
+        if (e.button !== 0) return; // Hanya proses klik kiri
+
+        const { row, col } = getCoords(parseInt(cell.dataset.index));
+
+        // Jika sedang dalam mode pindah, batalkan pindah sebelumnya jika ada
+        if (isMoving) {
+            alert("Selesaikan atau batalkan pemindahan saat ini terlebih dahulu.");
             return;
         }
-        isDragging = true;
-        processCellAction(cell, true); // True untuk showAlert pada klik awal
-        lastProcessedCell = cell;
+        
+        if (!selectedTool) {
+            alert("Pilih bangunan atau alat terlebih dahulu.");
+            return;
+        }
+
+        if (selectedTool === 'move') {
+            const type = gameGrid[row][col];
+            if (!type) {
+                // Tidak ada peringatan jika klik petak kosong dengan alat 'move'
+                return;
+            }
+            if (type === 'rumah_mewah_part') {
+                alert("Pindahkan Rumah Mewah dari ikon utamanya (kiri atas).");
+                return;
+            }
+
+            isMoving = true;
+            movingBuilding = { type, fromRow: row, fromCol: col };
+
+            // Hapus sementara dari grid
+            gameGrid[row][col] = null;
+            cell.innerHTML = '';
+            cell.removeAttribute('data-type');
+            gridContainer.style.cursor = 'grabbing'; // Ubah kursor
+        } else {
+            // Logika untuk menempatkan, menghapus, atau upgrade
+            isDragging = true;
+            lastProcessedCell = cell;
+
+            if (selectedTool === 'eraser') {
+                eraseBuilding(cell, row, col);
+            } else if (selectedTool === 'upgrade') {
+                upgradeBuilding(row, col);
+            } else { // Menempatkan bangunan baru
+                if (gameGrid[row][col]) {
+                    if (isDragging) { // Hanya tampilkan alert pada klik awal
+                        alert("Petak ini sudah terisi. Gunakan penghapus untuk membersihkannya.");
+                    }
+                    isDragging = false; // Batalkan drag jika petak awal sudah terisi
+                    return;
+                }
+                placeBuilding(cell, row, col);
+            }
+        }
     }
 
     // Fungsi untuk melanjutkan aksi saat drag
@@ -188,31 +243,54 @@ function initGame() {
         if (!isDragging || cell === lastProcessedCell) {
             return;
         }
-        processCellAction(cell, false); // False untuk tidak showAlert saat drag
+        
+        const { row, col } = getCoords(parseInt(cell.dataset.index));
+        
+        // Hanya proses jika tool bukan eraser atau upgrade (yang hanya bekerja per-klik)
+        if (selectedTool !== 'eraser' && selectedTool !== 'upgrade' && selectedTool !== 'move') {
+             if (gameGrid[row][col] === null) { // Hanya bangun di petak kosong
+                placeBuilding(cell, row, col);
+             }
+        }
         lastProcessedCell = cell;
     }
 
-    // Fungsi untuk mengakhiri aksi drag
-    function handleMouseUp() {
+    // Fungsi untuk mengakhiri aksi drag atau move
+    function handleMouseUp(e) {
+        gridContainer.style.cursor = 'pointer'; // Kembalikan kursor default
+
+        if (isMoving) {
+            const targetCell = e.target.closest('.grid-cell');
+            
+            // Jika dilepas di luar grid atau di petak yang terisi, batalkan
+            if (!targetCell || gameGrid[getCoords(parseInt(targetCell.dataset.index)).row][getCoords(parseInt(targetCell.dataset.index)).col]) {
+                if(targetCell) alert("Petak tujuan sudah terisi!");
+                revertMove();
+            } else {
+                // Selesaikan pemindahan
+                const { row: targetRow, col: targetCol } = getCoords(parseInt(targetCell.dataset.index));
+                const { type } = movingBuilding;
+                
+                gameGrid[targetRow][targetCol] = type;
+                const item = itemInfo[type];
+                if (item.type === 'road') {
+                    targetCell.innerHTML = `<div class="${item.blockClass}"></div>`;
+                } else {
+                    targetCell.innerHTML = `<i class="fas ${item.icon}"></i>`;
+                }
+                targetCell.dataset.type = type;
+            }
+            
+            // Reset status pindah
+            isMoving = false;
+            movingBuilding = null;
+            selectedTool = null;
+            const buttons = buildingButtonsContainer.querySelectorAll('button');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+        }
+
         isDragging = false;
         lastProcessedCell = null;
-    }
-
-    // Fungsi utama untuk memproses aksi pada sel (place atau erase)
-    function processCellAction(cell, showAlert) {
-        const { row, col } = getCoords(parseInt(cell.dataset.index));
-
-        if (selectedTool === 'eraser') {
-            eraseBuilding(cell, row, col);
-        } else {
-            if (gameGrid[row][col]) {
-                if (showAlert) {
-                    alert("Petak ini sudah terisi. Gunakan penghapus untuk membersihkannya.");
-                }
-                return;
-            }
-            placeBuilding(cell, row, col);
-        }
     }
 
     function placeBuilding(cell, row, col) {
@@ -255,27 +333,120 @@ function initGame() {
         updateInfoPanel();
     }
 
+    function revertMove() {
+        if (!movingBuilding) return;
+
+        const { type, fromRow, fromCol } = movingBuilding;
+        const originalCell = gridContainer.children[getIndex(fromRow, fromCol)];
+
+        // Kembalikan ke posisi semula
+        gameGrid[fromRow][fromCol] = type;
+        const item = itemInfo[type];
+        if (item.type === 'road') {
+            originalCell.innerHTML = `<div class="${item.blockClass}"></div>`;
+        } else {
+            originalCell.innerHTML = `<i class="fas ${item.icon}"></i>`;
+        }
+        originalCell.dataset.type = type;
+    }
+
+    function upgradeBuilding(row, col) {
+        const upgradeCost = itemInfo.upgrade.biaya;
+        if (sisaAnggaran < upgradeCost) {
+            alert("Anggaran tidak cukup untuk upgrade!");
+            return;
+        }
+
+        // Tentukan petak mana yang harus diperiksa untuk membentuk bujur sangkar 2x2
+        // Kita periksa 4 kemungkinan posisi bujur sangkar dimana (row, col) adalah salah satu sudutnya
+        const positions = [
+            { r: row, c: col }, // Klik di kiri-atas
+            { r: row, c: col - 1 }, // Klik di kanan-atas
+            { r: row - 1, c: col }, // Klik di kiri-bawah
+            { r: row - 1, c: col - 1 }  // Klik di kanan-bawah
+        ];
+
+        let foundSquare = false;
+        for (const pos of positions) {
+            const r1 = pos.r;
+            const c1 = pos.c;
+            const r2 = r1 + 1;
+            const c2 = c1 + 1;
+
+            // Pastikan semua koordinat dalam batas grid
+            if (r1 < 0 || c1 < 0 || r2 >= gridSize || c2 >= gridSize) continue;
+
+            const topLeft = gameGrid[r1][c1];
+            const topRight = gameGrid[r1][c2];
+            const bottomLeft = gameGrid[r2][c1];
+            const bottomRight = gameGrid[r2][c2];
+
+            if (topLeft === 'rumah' && topRight === 'rumah' && bottomLeft === 'rumah' && bottomRight === 'rumah') {
+                // Bujur sangkar ditemukan!
+                sisaAnggaran -= upgradeCost;
+                totalBiaya += upgradeCost;
+
+                // Hapus 4 rumah lama
+                const cellsToRemove = [getIndex(r1, c1), getIndex(r1, c2), getIndex(r2, c1), getIndex(r2, c2)];
+                cellsToRemove.forEach(index => {
+                    const cell = gridContainer.children[index];
+                    const {row, col} = getCoords(index);
+                    gameGrid[row][col] = null; // Kosongkan di grid internal
+                    cell.innerHTML = '';
+                    cell.removeAttribute('data-type');
+                });
+
+                // Tempatkan rumah mewah di petak kiri atas
+                gameGrid[r1][c1] = 'rumah_mewah';
+                const targetCell = gridContainer.children[getIndex(r1, c1)];
+                targetCell.innerHTML = `<i class="fas ${itemInfo.rumah_mewah.icon}"></i>`;
+                targetCell.dataset.type = 'rumah_mewah';
+
+                // Update hitungan
+                buildingCounts.rumah -= 4;
+                buildingCounts.rumah_mewah++;
+                jumlahRumah -= 4; // Kurangi jumlah rumah individu
+
+                updateInfoPanel();
+                foundSquare = true;
+                break; // Hentikan loop setelah upgrade berhasil
+            }
+        }
+
+        if (!foundSquare) {
+            alert("Upgrade gagal. Pastikan Anda mengklik salah satu dari empat rumah yang membentuk bujur sangkar 2x2.");
+        }
+    }
+
     function eraseBuilding(cell, row, col) {
         const type = gameGrid[row][col]; // Ambil tipe dari gameGrid
         if (!type || type === 'eraser') return; // Tidak ada yang bisa dihapus atau mencoba menghapus eraser itu sendiri
 
-        const item = itemInfo[type];
-        
-        // Kembalikan biaya ke anggaran
-        sisaAnggaran += item.biaya;
-        totalBiaya -= item.biaya;
-        totalKeuntungan -= (item.nilaiJual - item.biaya);
-        if(type === 'rumah') jumlahRumah--;
+        if (type === 'rumah_mewah') {
+            // Kembalikan biaya upgrade dan 4 rumah
+            const originalCost = itemInfo.rumah.biaya * 4;
+            const upgradeCost = itemInfo.upgrade.biaya;
+            sisaAnggaran += originalCost + upgradeCost;
+            totalBiaya -= (originalCost + upgradeCost);
+            buildingCounts.rumah_mewah--;
 
-        // Update buildingCounts
-        if (buildingCounts.hasOwnProperty(type)) {
-            buildingCounts[type]--;
+        } else if (type === 'rumah_mewah_part') {
+            alert("Gunakan penghapus pada ikon utama untuk menghapus Rumah Mewah.");
+            return;
+        } else {
+            // Logika penghapusan standar
+            const item = itemInfo[type];
+            sisaAnggaran += item.biaya;
+            totalBiaya -= item.biaya;
+            if(type === 'rumah') jumlahRumah--;
+
+            if (buildingCounts.hasOwnProperty(type)) {
+                buildingCounts[type]--;
+            }
         }
 
-        // Bersihkan gameGrid internal
+        // Bersihkan grid internal dan tampilan sel
         gameGrid[row][col] = null;
-
-        // Bersihkan tampilan sel
         cell.innerHTML = '';
         cell.removeAttribute('data-type');
         updateInfoPanel();
@@ -286,6 +457,7 @@ function initGame() {
         totalBiayaEl.textContent = `Rp. ${totalBiaya}`;
         totalKeuntunganEl.textContent = `Rp. ${totalKeuntungan}`;
         countRumahEl.textContent = buildingCounts.rumah;
+        countRumahMewahEl.textContent = buildingCounts.rumah_mewah;
         countTamanEl.textContent = buildingCounts.taman;
         countMushollahEl.textContent = buildingCounts.mushollah;
     }
@@ -295,6 +467,30 @@ function initGame() {
         const buttons = buildingButtonsContainer.querySelectorAll('button');
         buttons.forEach(btn => btn.classList.remove('selected'));
         button.classList.add('selected');
+    }
+
+    function updateBuildingInfoPanel(type) {
+        if (!type || type === 'eraser') {
+            buildingInfoPanel.innerHTML = '<p>Arahkan kursor ke bangunan untuk melihat detail.</p>';
+            return;
+        }
+
+        const item = itemInfo[type];
+        let infoHTML = `<p><strong>${type.replace('_', ' ').toUpperCase()}</strong></p>`;
+        infoHTML += `<p>Biaya: Rp. ${item.biaya}</p>`;
+        
+        if (item.nilaiJual > 0) {
+            infoHTML += `<p>Nilai Jual: Rp. ${item.nilaiJual}</p>`;
+        }
+
+        if (item.effectPercentage) {
+            const effectText = type === 'taman' || type === 'mushollah' 
+                ? 'Pengurangan Waktu Jual:' 
+                : 'Efek Konektivitas:';
+            infoHTML += `<p>${effectText} ${item.effectPercentage * 100}%</p>`;
+        }
+
+        buildingInfoPanel.innerHTML = infoHTML;
     }
 
     function showPopup(popup) {
@@ -310,24 +506,34 @@ function initGame() {
         
         let totalSellingTime = 0;
         let sellableHouses = 0;
+        let sellableMewah = 0;
 
         for (let r = 0; r < gridSize; r++) {
             for (let c = 0; c < gridSize; c++) {
-                if (gameGrid[r][c] === 'rumah') {
+                const building = gameGrid[r][c];
+                if (building === 'rumah' || building === 'rumah_mewah') {
                     if (isConnectedToRoad(r, c)) {
-                        sellableHouses++;
-                        let houseSellingTime = itemInfo.rumah.baseSellingTime; // Waktu dasar 30 hari
+                        let itemData, sellableCounter;
+                        if (building === 'rumah') {
+                            sellableHouses++;
+                            itemData = itemInfo.rumah;
+                        } else {
+                            sellableMewah++;
+                            itemData = itemInfo.rumah_mewah;
+                        }
+
+                        let houseSellingTime = itemData.baseSellingTime;
                         let totalReductionPercentage = 0;
 
                         for (let r2 = 0; r2 < gridSize; r2++) {
                             for (let c2 = 0; c2 < gridSize; c2++) {
-                                const buildingType = gameGrid[r2][c2];
-                                if (buildingType && (buildingType === 'taman' || buildingType === 'jalan_utama' || buildingType === 'jalan_sekunder' || buildingType === 'mushollah')) {
+                                const facilityType = gameGrid[r2][c2];
+                                if (facilityType && (facilityType === 'taman' || facilityType === 'jalan_utama' || facilityType === 'jalan_sekunder' || facilityType === 'mushollah')) {
                                     const distance = calculateDistance(r, c, r2, c2);
-                                    if (distance > 0) { // Pastikan bukan sel rumah itu sendiri
-                                        const itemEffect = itemInfo[buildingType].effectPercentage;
+                                    if (distance > 0) {
+                                        const itemEffect = itemInfo[facilityType].effectPercentage;
                                         const decay = distance * DISTANCE_DECAY_PER_GRID;
-                                        const actualEffect = Math.max(0, itemEffect - decay); // Efek tidak bisa negatif
+                                        const actualEffect = Math.max(0, itemEffect - decay);
                                         totalReductionPercentage += actualEffect;
                                     }
                                 }
@@ -335,15 +541,16 @@ function initGame() {
                         }
                         
                         houseSellingTime *= (1 - Math.min(1, totalReductionPercentage));
-                        totalSellingTime += Math.max(1, Math.round(houseSellingTime)); // Akumulasi waktu penjualan
+                        totalSellingTime += Math.max(1, Math.round(houseSellingTime));
                     } else {
-                        console.log(`Rumah di (${r},${c}) tidak terhubung dengan jalan dan tidak dapat dijual.`);
+                        console.log(`${building} di (${r},${c}) tidak terhubung dengan jalan dan tidak dapat dijual.`);
                     }
                 }
             }
         }
 
-        if (sellableHouses === 0) {
+        const totalSellableUnits = sellableHouses + sellableMewah;
+        if (totalSellableUnits === 0) {
             alert("Tidak ada rumah yang terhubung dengan jalan. Bangun rumah dan pastikan terhubung dengan jalan agar bisa dijual!");
             return;
         }
@@ -363,7 +570,7 @@ function initGame() {
             if (progressDays > totalSellingTime) progressDays = totalSellingTime;
 
             const progressPercentage = (progressDays / totalSellingTime) * 100;
-            const currentSoldUnits = Math.min(sellableHouses, Math.floor(sellableHouses * (progressDays / totalSellingTime)));
+            const currentSoldUnits = Math.min(totalSellableUnits, Math.floor(totalSellableUnits * (progressDays / totalSellingTime)));
             soldUnitsCount.textContent = currentSoldUnits;
 
             progressBarFill.style.width = `${progressPercentage}%`;
@@ -378,9 +585,10 @@ function initGame() {
 
         const showSummary = () => {
             hidePopup(loadingPopup);
-            const finalTotalPenjualan = sellableHouses * itemInfo.rumah.nilaiJual;
-            const rumahTidakTerjual = jumlahRumah - sellableHouses;
-            const kerugian = itemInfo.rumah.biaya * rumahTidakTerjual;
+            const finalTotalPenjualan = (sellableHouses * itemInfo.rumah.nilaiJual) + (sellableMewah * itemInfo.rumah_mewah.nilaiJual);
+            const rumahTidakTerjual = buildingCounts.rumah - sellableHouses;
+            const mewahTidakTerjual = buildingCounts.rumah_mewah - sellableMewah;
+            const kerugian = (itemInfo.rumah.biaya * rumahTidakTerjual) + (itemInfo.rumah_mewah.biaya * mewahTidakTerjual);
             const finalTotalKeuntungan = finalTotalPenjualan - totalBiaya - kerugian;
             const PENALTY_FACTOR = 4; // Faktor penalti yang disarankan
             const overallScore = finalTotalKeuntungan - (totalSellingTime * PENALTY_FACTOR);
@@ -417,6 +625,18 @@ function initGame() {
             const toolType = button.dataset.type;
             selectTool(toolType, button);
         }
+    });
+
+    buildingButtonsContainer.addEventListener('mouseover', (e) => {
+        const button = e.target.closest('button');
+        if (button) {
+            const toolType = button.dataset.type;
+            updateBuildingInfoPanel(toolType);
+        }
+    });
+
+    buildingButtonsContainer.addEventListener('mouseout', () => {
+        updateBuildingInfoPanel(null); // Reset panel when mouse leaves the container
     });
 
     clearButton.addEventListener('click', () => {

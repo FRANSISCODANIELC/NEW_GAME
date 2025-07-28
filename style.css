@@ -1,66 +1,79 @@
-/* CSS Umum */
-body {
+/* CSS Umum & 16:9 Aspect Ratio */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Mencegah scroll bar */
+    background-color: #000; /* Latar belakang hitam untuk letterboxing */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f8ff;
-    color: #333;
+}
+
+body {
     display: flex;
     justify-content: center;
-    align-items: center; /* Center the main container */
-    min-height: 100vh;
-    margin: 0;
+    align-items: center;
 }
 
 #main-container {
+    background-color: #f0f8ff;
+    overflow: hidden;
+    position: relative;
+
+    /* 16:9 Aspect Ratio Logic */
+    width: 100vw;
+    height: 56.25vw; /* 9 / 16 = 0.5625 */
+    max-height: 100vh;
+    max-width: 177.78vh; /* 16 / 9 = 1.7778 */
+    margin: auto;
+    top: 0; bottom: 0; left: 0; right: 0;
+
+    /* Layouting di dalam container utama */
     display: flex;
-    flex-direction: column; /* Stack game and info panel vertically */
-    align-items: center; /* Center children horizontally */
-    gap: 20px;
-    border: 5px solid #0056b3; /* Border tetap */
-    padding: 20px; /* Tambahkan padding agar konten tidak terlalu mepet border */
-    border-radius: 15px; /* Sudut membulat untuk border */
-    max-width: 1000px; /* Batasi lebar maksimum */
-    max-height: 700px; /* Batasi tinggi maksimum */
-    box-sizing: border-box; /* Pastikan padding dan border termasuk dalam ukuran */
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; /* Mendorong info proyek ke bawah */
+    padding: 2vmin; /* Padding responsif */
+    box-sizing: border-box;
 }
 
 /* Halaman Game */
 #game-container {
     display: flex;
     flex-direction: row;
-    align-items: stretch; /* Penting: agar tinggi grid-card dan info-panel sama */
-    gap: 20px;
+    gap: 2vmin;
+    width: 100%;
+    height: 80%; /* Alokasikan 80% tinggi untuk area game utama */
 }
 
 #grid-card {
     background-color: #ffffff;
-    padding: 20px; /* Padding agar grid tidak terlalu mepet */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    display: flex; /* Untuk memusatkan grid di dalamnya */
+    border-radius: 1.5vmin;
+    box-shadow: 0 0.5vmin 1vmin rgba(0,0,0,0.1);
+    display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 600px; /* Batasi lebar maksimum grid card */
-    max-height: 600px; /* Batasi tinggi maksimum grid card */
-    overflow: auto; /* Tambahkan scroll jika konten melebihi batas */
-    box-sizing: border-box; /* Pastikan padding dan border termasuk dalam ukuran */
+    flex: 3; /* Grid mengambil porsi lebih besar */
+    padding: 2vmin;
+    box-sizing: border-box;
 }
 
 #grid-container {
     display: grid;
-    border: 3px solid #0056b3;
+    border: 0.4vmin solid #0056b3;
 }
 
 .grid-cell {
-    width: 40px;
-    height: 40px;
-    border: 1px solid #add8e6;
+    width: 4.5vmin;
+    height: 4.5vmin;
+    border: 0.1vmin solid #add8e6;
     box-sizing: border-box;
     cursor: pointer;
     background-color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
+    font-size: 2.5vmin; /* Ukuran ikon responsif */
 }
 
 .grid-cell:hover {
@@ -69,74 +82,79 @@ body {
 
 /* Ikon di Grid */
 .fa-home { color: #c0392b; }
+.fa-building { color: #9b59b6; font-size: 3vmin; }
 .fa-tree { color: #27ae60; }
 .fa-mosque { color: #2980b9; }
 .fa-eraser { color: #e74c3c; }
+.fa-arrow-alt-circle-up { color: #f39c12; }
+.fa-arrows-alt { color: #1abc9c; }
 .fa-road { color: #333; } /* Warna default untuk ikon jalan */
 .fa-road.sekunder { color: #8B4513; } /* Warna cokelat untuk ikon jalan sekunder */
 
-/* Jalan sebagai blok hitam */
-.jalan-block-utama {
-    background-color: #333 !important;
+/* Jalan sebagai blok */
+.jalan-block-utama, .jalan-block-sekunder {
     width: 100%;
     height: 100%;
 }
-
-.jalan-block-sekunder {
-    background-color: #8B4513 !important; /* Cokelat */
-    width: 100%;
-    height: 100%;
-}
+.jalan-block-utama { background-color: #333 !important; }
+.jalan-block-sekunder { background-color: #8B4513 !important; }
 
 #info-panel {
-    width: 220px;
-    padding: 20px;
+    flex: 1; /* Panel info mengambil porsi lebih kecil */
+    padding: 2vmin;
     background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    display: flex; /* Menggunakan flexbox untuk mengatur konten di dalamnya */
+    border-radius: 1.5vmin;
+    box-shadow: 0 0.5vmin 1vmin rgba(0,0,0,0.1);
+    display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Untuk mendorong tombol aksi ke bawah */
+    justify-content: space-between; /* Mendorong konten ke atas dan bawah */
+    font-size: 1.5vmin;
 }
 
 #project-info-panel {
-    width: 840px; /* Lebar disesuaikan dengan total lebar grid-card + info-panel + gap */
-    padding: 15px;
+    width: 100%;
+    height: 15%; /* Alokasikan 15% tinggi untuk info proyek */
+    padding: 1.5vmin;
     background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    text-align: center;
+    border-radius: 1.5vmin;
+    box-shadow: 0 0.5vmin 1vmin rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 1.6vmin;
 }
 
-#project-info-panel h3 {
+#project-info-panel h3, #info-panel h3 {
     margin-top: 0;
     color: #0056b3;
+    border-bottom: 0.2vmin solid #f0f8ff;
+    padding-bottom: 1vmin;
+    margin-bottom: 1.5vmin;
+    font-size: 2vmin;
+}
+
+#building-selection-group {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Memastikan grup ini mengambil semua ruang yang tersedia */
+    justify-content: space-between; /* Mendorong panel info ke bawah */
 }
 
 #project-info-panel p {
-    display: inline-block;
-    margin: 0 15px;
-    font-size: 16px;
-}
-
-#info-panel h3 {
-    color: #0056b3;
-    border-bottom: 2px solid #f0f8ff;
-    padding-bottom: 10px;
-    margin-top: 0;
+    margin: 0;
 }
 
 #building-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(6vmin, 1fr));
+    gap: 1vmin;
 }
 
 #building-buttons button {
-    font-size: 24px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    font-size: 2.5vmin;
+    padding: 1.5vmin;
+    border: 0.1vmin solid #ccc;
+    border-radius: 0.5vmin;
     background-color: #f9f9f9;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -151,171 +169,114 @@ body {
     border-color: #007bff;
 }
 
-/* Tombol Aksi (Clear, Jual, Menu) */
-.action-button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
+/* Panel Info Bangunan */
+.info-box {
+    margin-top: 1.5vmin;
+    padding: 1vmin;
+    background-color: #e9f5ff;
+    border: 0.1vmin solid #b3d7ff;
+    border-radius: 0.5vmin;
+    font-size: 1.4vmin;
+    min-height: 8vmin; /* Menetapkan tinggi minimum untuk mencegah pergeseran */
     box-sizing: border-box;
 }
 
-#clear-button {
-    background-color: #dc3545;
+.info-box p { margin: 0.5vmin 0; }
+.info-box strong { color: #0056b3; }
+
+/* Tombol Aksi (Clear, Jual, Menu) */
+.action-button {
+    width: 100%;
+    padding: 1.2vmin;
+    border: none;
+    border-radius: 0.5vmin;
+    color: white;
+    font-size: 1.6vmin;
+    cursor: pointer;
+    margin-top: 1vmin;
+    box-sizing: border-box;
 }
 
-#clear-button:hover {
-    background-color: #c82333;
-}
-
-#sell-button, #menu-button {
-    background-color: #007bff;
-}
-
-#sell-button:hover, #menu-button:hover {
-    background-color: #0056b3;
-}
+#clear-button { background-color: #dc3545; }
+#clear-button:hover { background-color: #c82333; }
+#sell-button, #menu-button { background-color: #007bff; }
+#sell-button:hover, #menu-button:hover { background-color: #0056b3; }
 
 /* Pop-up */
 .popup {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.6);
     justify-content: center;
     align-items: center;
 }
 
-/* Gaya untuk ringkasan penjualan */
-#summary-popup .popup-content p {
-    margin-bottom: 5px;
-}
-
-#summary-modal { color: #ff8c00; } /* Orange */
-#summary-terjual { color: #800080; } /* Ungu */
-#summary-penjualan { color: #a0522d; } /* Cokelat */
-#summary-tidak-terjual, #summary-kerugian { color: #dc3545; } /* Merah */
-#summary-keuntungan { color: #28a745; } /* Hijau */
-#summary-waktu { color: #007bff; } /* Biru */
-#summary-score { color: #ffc107; } /* Kuning/Emas untuk skor */
-
 .popup-content {
     background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 400px;
-    border-radius: 10px;
+    padding: 3vmin;
+    border: 0.1vmin solid #888;
+    width: 90%;
+    max-width: 50vmin;
+    border-radius: 1vmin;
     text-align: center;
+    font-size: 1.8vmin;
 }
 
-/* Gaya untuk tombol menu di dalam pop-up (disalin dari login_style.css) */
+.popup-content h3 {
+    font-size: 2.5vmin;
+}
+
+/* Gaya untuk ringkasan penjualan */
+#summary-popup .popup-content p { margin-bottom: 1vmin; }
+#summary-modal { color: #ff8c00; }
+#summary-terjual { color: #800080; }
+#summary-penjualan { color: #a0522d; }
+#summary-tidak-terjual, #summary-kerugian { color: #dc3545; }
+#summary-keuntungan { color: #28a745; }
+#summary-waktu { color: #007bff; }
+#summary-score { color: #ffc107; }
+
 .popup-content .menu-button {
-    width: 200px; /* Lebar tetap untuk konsistensi */
-    padding: 12px;
+    width: 60%;
+    padding: 1.5vmin;
     border: none;
-    border-radius: 4px;
+    border-radius: 0.5vmin;
     background-color: #007bff;
     color: white;
-    font-size: 16px;
+    font-size: 1.8vmin;
     cursor: pointer;
     display: block;
-    margin: 0 auto 10px auto; /* Pusatkan tombol dan berikan margin bawah */
+    margin: 1vmin auto;
     text-decoration: none;
 }
 
-.popup-content .menu-button:hover {
-    background-color: #0056b3;
-}
-
-.popup-content .menu-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
+.popup-content .menu-button:hover { background-color: #0056b3; }
+.popup-content .menu-button:disabled { background-color: #cccccc; cursor: not-allowed; }
 
 /* Gaya untuk progress bar */
 .progress-bar-container {
     width: 80%;
     background-color: #e0e0e0;
-    border-radius: 5px;
-    margin: 20px auto;
-    height: 25px;
+    border-radius: 1vmin;
+    margin: 2vmin auto;
+    height: 3vmin;
     overflow: hidden;
 }
 
 .progress-bar-fill {
     height: 100%;
     width: 0%;
-    background-color: #4CAF50; /* Green */
-    border-radius: 5px;
-    text-align: center;
-    line-height: 25px; /* Center text vertically */
-    color: white;
-    font-weight: bold;
-    transition: width 0.1s linear; /* Smooth transition for width */
+    background-color: #4CAF50;
+    border-radius: 1vmin;
+    transition: width 0.1s linear;
 }
 
-/* Responsive */
+/* Penyesuaian grid size di script.js mungkin diperlukan agar pas dengan vmin */
 @media (max-width: 768px) {
-    #game-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    #info-panel {
-        width: 100%;
-        max-width: 400px;
-        margin-top: 20px;
-    }
-
-    #project-info-panel {
-        width: 100%;
-        max-width: 400px;
-    }
-}
-
-@media (max-width: 480px) {
-    #dashboard-box, #login-box {
-        width: 90%;
-        padding: 20px;
-    }
-
-    #grid-container {
-        grid-template-columns: repeat(9, 30px);
-        grid-template-rows: repeat(9, 30px);
-    }
-
-    .grid-cell {
-        width: 30px;
-        height: 30px;
-        font-size: 16px;
-    }
-
-    #info-panel {
-        padding: 15px;
-    }
-
-    #building-buttons {
-        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-        gap: 5px;
-    }
-
-    #building-buttons button {
-        font-size: 20px;
-        padding: 10px;
-    }
-
-    .popup-content {
-        width: 90%;
-    }
+    /* Aturan di sini mungkin tidak lagi diperlukan karena penskalaan vmin/vmax */
 }

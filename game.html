@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Developer Kompleks Perumahan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -16,20 +16,31 @@
             </div>
 
             <div id="info-panel">
-                <h3>Pilih Bangunan</h3>
-                <div id="building-buttons">
-                    <button data-type="rumah" title="Rumah (Biaya: Rp. 50)"><i class="fas fa-home"></i></button>
-                    <button data-type="taman" title="Taman (Biaya: Rp. 5)"><i class="fas fa-tree"></i></button>
-                    <button data-type="jalan_utama" title="Jalan Utama (Biaya: Rp. 2)"><i class="fas fa-road"></i></button>
-                    <button data-type="jalan_sekunder" title="Jalan Sekunder (Biaya: Rp. 1)"><i class="fas fa-road sekunder"></i></button>
-                    <button data-type="mushollah" title="Mushollah (Biaya: Rp. 50)"><i class="fas fa-mosque"></i></button>
-                    <button data-type="eraser" title="Hapus Bangunan"><i class="fas fa-eraser"></i></button>
+                <div id="building-selection-group">
+                    <div id="building-controls-top">
+                        <h3>Pilih Bangunan</h3>
+                        <div id="building-buttons">
+                            <button data-type="rumah" title="Rumah (Biaya: Rp. 50)"><i class="fas fa-home"></i></button>
+                            <button data-type="taman" title="Taman (Biaya: Rp. 5)"><i class="fas fa-tree"></i></button>
+                            <button data-type="jalan_utama" title="Jalan Utama (Biaya: Rp. 2)"><i class="fas fa-road"></i></button>
+                            <button data-type="jalan_sekunder" title="Jalan Sekunder (Biaya: Rp. 1)"><i class="fas fa-road sekunder"></i></button>
+                            <button data-type="mushollah" title="Mushollah (Biaya: Rp. 50)"><i class="fas fa-mosque"></i></button>
+                            <button data-type="upgrade" title="Upgrade Rumah (Biaya: Rp. 50)"><i class="fas fa-arrow-alt-circle-up"></i></button>
+                            <button data-type="move" title="Pindahkan Bangunan"><i class="fas fa-arrows-alt"></i></button>
+                            <button data-type="eraser" title="Hapus Bangunan"><i class="fas fa-eraser"></i></button>
+                        </div>
+                    </div>
+                    <div id="building-info-panel" class="info-box">
+                        <p>Arahkan kursor ke bangunan untuk melihat detail.</p>
+                    </div>
                 </div>
-                <hr>
-                <h3>Aksi</h3>
-                <button id="clear-button" class="action-button">Clear Desain</button>
-                <button id="sell-button" class="action-button">Jual</button>
-                <button id="menu-button" class="action-button">Menu</button>
+                <div id="action-panel-group">
+                    <hr>
+                    <h3>Aksi</h3>
+                    <button id="clear-button" class="action-button">Clear Desain</button>
+                    <button id="sell-button" class="action-button">Jual</button>
+                    <button id="menu-button" class="action-button">Menu</button>
+                </div>
             </div>
         </div>
 
@@ -104,6 +115,7 @@
             <p>Total Keuntungan: Rp. <span id="total-keuntungan">0</span></p>
             <hr>
             <p><i class="fas fa-home" style="color: #c0392b;"></i> Rumah: <span id="count-rumah">0</span></p>
+            <p><i class="fas fa-gem" style="color: #9b59b6;"></i> Rumah Mewah: <span id="count-rumah-mewah">0</span></p>
             <p><i class="fas fa-tree" style="color: #27ae60;"></i> Taman: <span id="count-taman">0</span></p>
             <p><i class="fas fa-mosque" style="color: #2980b9;"></i> Mushollah: <span id="count-mushollah">0</span></p>
         </div>
