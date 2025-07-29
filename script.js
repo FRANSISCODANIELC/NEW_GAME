@@ -674,13 +674,17 @@ function initGame() {
         };
     }
 
-    buildingButtonsContainer.addEventListener('click', (e) => {
+    buildingButtonsContainer.addEventListener('click', handleBuildingButtonClick);
+    buildingButtonsContainer.addEventListener('touchstart', handleBuildingButtonClick);
+
+    function handleBuildingButtonClick(e) {
         const button = e.target.closest('button');
         if (button) {
             const toolType = button.dataset.type;
             selectTool(toolType, button);
+            e.preventDefault(); // Prevent potential double-firing of click on some mobile browsers
         }
-    });
+    }
 
     buildingButtonsContainer.addEventListener('mouseover', (e) => {
         const button = e.target.closest('button');
@@ -699,15 +703,22 @@ function initGame() {
             resetGame();
         }
     });
+    clearButton.addEventListener('touchstart', () => {
+        if (confirm("Apakah Anda yakin ingin membersihkan semua bangunan?")) {
+            resetGame();
+        }
+    });
 
     if (sellButton) {
         sellButton.addEventListener('click', simulateSale);
+        sellButton.addEventListener('touchstart', simulateSale);
     } else {
         console.error("Elemen tombol Jual tidak ditemukan!");
     }
 
     if (menuButton) {
         menuButton.addEventListener('click', () => showPopup(menuPopup));
+        menuButton.addEventListener('touchstart', () => showPopup(menuPopup));
     }
 
     if (rulesButton) {
@@ -715,14 +726,20 @@ function initGame() {
             hidePopup(menuPopup); // Sembunyikan menu utama
             showPopup(rulesPopup); // Tampilkan pop-up aturan
         });
+        rulesButton.addEventListener('touchstart', () => {
+            hidePopup(menuPopup); // Sembunyikan menu utama
+            showPopup(rulesPopup); // Tampilkan pop-up aturan
+        });
     }
 
     if (closeRulesPopup) {
         closeRulesPopup.addEventListener('click', () => hidePopup(rulesPopup));
+        closeRulesPopup.addEventListener('touchstart', () => hidePopup(rulesPopup));
     }
 
     if (fullscreenButton) {
         fullscreenButton.addEventListener('click', toggleFullscreen);
+        fullscreenButton.addEventListener('touchstart', toggleFullscreen);
     }
 
     function toggleFullscreen() {
@@ -740,6 +757,7 @@ function initGame() {
     const resumeGameButton = menuPopup.querySelector('button');
     if (resumeGameButton) {
         resumeGameButton.addEventListener('click', () => hidePopup(menuPopup));
+        resumeGameButton.addEventListener('touchstart', () => hidePopup(menuPopup));
     }
 
     closeSummaryButton.addEventListener('click', () => {
