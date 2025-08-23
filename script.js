@@ -272,9 +272,6 @@ function initGame() {
                 // Reset status pindah
                 isMoving = false;
                 movingBuilding = null;
-                selectedTool = null; // Batalkan pilihan alat setelah pindah
-                const buttons = buildingButtonsContainer.querySelectorAll('button');
-                buttons.forEach(btn => btn.classList.remove('selected'));
                 gridContainer.style.cursor = 'pointer'; // Kembalikan kursor
                 updateInfoPanel();
 

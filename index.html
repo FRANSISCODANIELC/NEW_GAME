@@ -12,22 +12,46 @@
             <h1>Developer Kompleks Perumahan</h1>
             <p>Silakan masukkan nama Anda untuk memulai</p>
             <input type="text" id="username" placeholder="Masukkan Nama Anda">
+            <div id="captcha-container">
+                <label id="captcha-label" for="captcha-input"></label>
+                <input type="text" id="captcha-input" placeholder="Jawaban Anda">
+            </div>
             <button id="login-button">Masuk</button>
         </div>
     </div>
     <script>
-        // Simulasi login sederhana
-        document.getElementById('login-button').addEventListener('click', () => {
+        const loginButton = document.getElementById('login-button');
+        const captchaLabel = document.getElementById('captcha-label');
+        const captchaInput = document.getElementById('captcha-input');
+        let captchaAnswer = 0;
+
+        function generateCaptcha() {
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            captchaAnswer = num1 + num2;
+            captchaLabel.textContent = `Berapa ${num1} + ${num2}?`;
+        }
+
+        loginButton.addEventListener('click', () => {
             const username = document.getElementById('username').value;
+            const userAnswer = parseInt(captchaInput.value);
+
+            if (userAnswer !== captchaAnswer) {
+                alert('Jawaban CAPTCHA salah!');
+                generateCaptcha();
+                return;
+            }
+
             if (username.trim() !== '') {
-                const developerProfile = {
-                    name: username,
-                    capital: 0 // Modal awal 0, akan diatur di profile.html
-                };
-                localStorage.setItem('developerProfile', JSON.stringify(developerProfile));
+                localStorage.setItem('username', username);
                 window.location.href = 'dashboard.html';
+            } else {
+                alert('Nama tidak boleh kosong!');
             }
         });
+
+        // Initial CAPTCHA generation
+        generateCaptcha();
     </script>
 </body>
 </html>
