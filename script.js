@@ -1,6 +1,13 @@
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
     if (document.getElementById('grid-container')) {
         initGame();
+    }
+});
+
+// Add resize listener
+window.addEventListener('resize', () => {
+    if (document.getElementById('grid-container')) {
+        createGrid();
     }
 });
 
@@ -104,16 +111,10 @@ function initGame() {
     function createGrid() {
         gridContainer.innerHTML = '';
 
-        // Dapatkan ukuran main-container yang sudah diskalakan 16:9
-        const mainContainer = document.getElementById('main-container');
-        const mainContainerWidth = mainContainer.clientWidth;
-        const mainContainerHeight = mainContainer.clientHeight;
+        const gridCard = document.getElementById('grid-card');
+        const availableWidthForGrid = gridCard.clientWidth - (2 * parseFloat(getComputedStyle(gridCard).paddingLeft));
+        const availableHeightForGrid = gridCard.clientHeight - (2 * parseFloat(getComputedStyle(gridCard).paddingTop));
 
-        // Alokasikan sebagian ruang untuk grid (misalnya 70% dari tinggi main-container)
-        const availableHeightForGrid = mainContainerHeight * 0.7; 
-        const availableWidthForGrid = mainContainerWidth * 0.7; // Sesuaikan jika perlu
-
-        // Hitung ukuran sel optimal berdasarkan ruang yang dialokasikan
         const cellSize = Math.floor(Math.min(availableWidthForGrid / gridSize, availableHeightForGrid / gridSize));
 
         gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, ${cellSize}px)`;
@@ -121,20 +122,31 @@ function initGame() {
         gridContainer.style.width = `${gridSize * cellSize}px`;
         gridContainer.style.height = `${gridSize * cellSize}px`;
 
-        // Pastikan grid tidak melebihi grid-card
-        const gridCard = document.getElementById('grid-card');
-        gridCard.style.maxWidth = `${gridSize * cellSize}px`;
-        gridCard.style.maxHeight = `${gridSize * cellSize}px`;
+        for (let i = 0; i < gridSize; i++) {
+            for (let j = 0; j < gridSize; j++) {
+                const cell = document.createElement('div');
+                cell.classList.add('grid-cell');
+                cell.dataset.index = getIndex(i, j);
+                cell.style.fontSize = `${cellSize * 0.6}px`;
 
-        for (let i = 0; i < gridSize * gridSize; i++) {
-            const cell = document.createElement('div');
-            cell.classList.add('grid-cell');
-            cell.dataset.index = i;
-            cell.style.fontSize = `${cellSize * 0.6}px`; // Ukuran ikon proporsional dengan sel
-            // Event listener untuk drag-and-drop
-            cell.addEventListener('mousedown', (e) => handleMouseDown(e, cell));
-            cell.addEventListener('mouseover', () => handleMouseOver(cell));
-            gridContainer.appendChild(cell);
+                const buildingType = gameGrid[i][j];
+                if (buildingType) {
+                    const item = itemInfo[buildingType];
+                    if (item.type === 'road') {
+                        cell.innerHTML = `<div class="${item.blockClass}"></div>`;
+                    } else {
+                        cell.innerHTML = `<i class="fas ${item.icon}"></i>`;
+                    }
+                    cell.dataset.type = buildingType;
+                }
+
+                cell.addEventListener('mousedown', (e) => handleMouseDown(e, cell));
+                cell.addEventListener('mouseover', () => handleMouseOver(cell));
+                cell.addEventListener('touchstart', (e) => handleTouchStart(e, cell));
+                cell.addEventListener('touchmove', (e) => handleTouchMove(e));
+                cell.addEventListener('touchend', (e) => handleTouchEnd(e));
+                gridContainer.appendChild(cell);
+            }
         }
     }
 

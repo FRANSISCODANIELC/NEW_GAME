@@ -20,12 +20,10 @@ body {
     overflow: hidden;
     position: relative;
 
-    /* 16:9 Aspect Ratio Logic */
-    width: 100vw;
-    height: 56.25vw; /* 9 / 16 = 0.5625 */
-    max-height: 100vh;
-    max-width: 177.78vh; /* 16 / 9 = 1.7778 */
-    margin: auto;
+    /* Make container fill the screen */
+    width: 100%;
+    height: 100%;
+    margin: 0;
     top: 0; bottom: 0; left: 0; right: 0;
 
     /* Layouting di dalam container utama */
@@ -280,7 +278,45 @@ body {
     transition: width 0.1s linear;
 }
 
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+    #main-container {
+        height: auto;
+        padding: 1em;
+    }
 
+    #game-container {
+        flex-direction: column;
+        height: auto;
+    }
 
+    #right-side-panels {
+        width: 100%;
+        flex: 1;
+    }
 
+    #grid-card {
+        flex: 1;
+        padding: 1em;
+        min-height: 50vw;
+    }
 
+    #info-panel, #project-info-panel {
+        font-size: 2.5vmin;
+    }
+
+    #building-buttons button {
+        font-size: 4vmin;
+        padding: 2vmin;
+    }
+
+    .action-button {
+        font-size: 2.5vmin;
+        padding: 2vmin;
+    }
+
+    .popup-content {
+        width: 80%;
+        font-size: 2.5vmin;
+    }
+}
