@@ -76,6 +76,40 @@
         #developer-detail-modal .modal-content p {
             margin-bottom: 10px;
         }
+        #avatar-selection {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .avatar-choice {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .avatar-choice.selected {
+            border-color: #007bff;
+        }
+        #detail-dev-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .profile-button-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .profile-button-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
     </style>
 </head>
 <body>
@@ -106,6 +140,16 @@
             <input type="text" id="new-dev-name" placeholder="Nama Developer" required>
             <input type="number" id="new-dev-age" placeholder="Usia" min="18" required>
             <input type="number" id="new-dev-capital" placeholder="Modal Awal (min. 1000)" min="1000" required>
+            
+            <h4>Pilih Avatar</h4>
+            <div id="avatar-selection">
+                <img src="https://robohash.org/1.png?set=set4" class="avatar-choice" data-avatar="https://robohash.org/1.png?set=set4">
+                <img src="https://robohash.org/2.png?set=set4" class="avatar-choice" data-avatar="https://robohash.org/2.png?set=set4">
+                <img src="https://robohash.org/3.png?set=set4" class="avatar-choice" data-avatar="https://robohash.org/3.png?set=set4">
+                <img src="https://robohash.org/4.png?set=set4" class="avatar-choice" data-avatar="https://robohash.org/4.png?set=set4">
+            </div>
+            <input type="hidden" id="selected-avatar" value="">
+
             <button id="save-new-profile">Simpan Profil</button>
             <button id="cancel-create-profile">Batal</button>
         </div>
@@ -115,6 +159,7 @@
     <div id="developer-detail-modal" class="modal">
         <div class="modal-content">
             <h3>Detail Developer</h3>
+            <img id="detail-dev-avatar" src="" alt="Developer Avatar">
             <p>Nama: <span id="detail-dev-name"></span></p>
             <p>Usia: <span id="detail-dev-age"></span></p>
             <p>Saldo: Rp. <span id="detail-dev-capital"></span></p>
@@ -170,28 +215,16 @@
         const newDevCapitalInput = document.getElementById('new-dev-capital');
         const saveNewProfileButton = document.getElementById('save-new-profile');
         const cancelCreateProfileButton = document.getElementById('cancel-create-profile');
+        const avatarChoices = document.getElementById('avatar-selection');
+        const selectedAvatarInput = document.getElementById('selected-avatar');
 
         // Elements in developer detail modal
+        const detailDevAvatarEl = document.getElementById('detail-dev-avatar');
         const detailDevNameEl = document.getElementById('detail-dev-name');
         const detailDevAgeEl = document.getElementById('detail-dev-age');
         const detailDevCapitalEl = document.getElementById('detail-dev-capital');
         const startDesignButton = document.getElementById('start-design-button');
         const deleteProfileButton = document.getElementById('delete-profile-button');
-
-        // ... (existing code)
-
-        // Delete Profile Button
-        deleteProfileButton.addEventListener('click', () => {
-            if (confirm('Apakah Anda yakin ingin menghapus profil ini? Aksi ini tidak dapat dibatalkan.')) {
-                let profiles = getDeveloperProfiles();
-                profiles.splice(activeDeveloperIndex, 1); // Remove the active profile
-                saveDeveloperProfiles(profiles);
-                localStorage.removeItem('activeDeveloperIndex'); // Clear active profile
-                activeDeveloperIndex = -1;
-                hideModal(developerDetailModal);
-                showModal(newGameOptionsModal);
-            }
-        });
         const backToNewGameOptionsButton = document.getElementById('back-to-new-game-options');
 
         // Elements in load profile modal
@@ -248,10 +281,9 @@
                 window.location.href = 'index.html'; // Redirect to login if no user
             }
 
-            // Check if we need to show developer detail after returning from game
             const showDevDetailFlag = localStorage.getItem('showDeveloperDetail');
             if (showDevDetailFlag === 'true') {
-                localStorage.removeItem('showDeveloperDetail'); // Clear the flag
+                localStorage.removeItem('showDeveloperDetail');
                 const activeDev = getActiveDeveloper();
                 if (activeDev) {
                     displayDeveloperDetail(activeDev);
@@ -262,17 +294,26 @@
 
         // --- Event Listeners ---
 
-        // New Game Button (Main Menu)
+        // Avatar Selection
+        avatarChoices.addEventListener('click', (e) => {
+            if (e.target.classList.contains('avatar-choice')) {
+                avatarChoices.querySelectorAll('.avatar-choice').forEach(img => img.classList.remove('selected'));
+                e.target.classList.add('selected');
+                selectedAvatarInput.value = e.target.dataset.avatar;
+            }
+        });
+
         newGameButton.addEventListener('click', () => {
             showModal(newGameOptionsModal);
         });
 
-        // New Game Options Modal Buttons
         newProfileButton.addEventListener('click', () => {
             hideModal(newGameOptionsModal);
             newDevNameInput.value = '';
             newDevAgeInput.value = '';
             newDevCapitalInput.value = '';
+            selectedAvatarInput.value = '';
+            avatarChoices.querySelectorAll('.avatar-choice').forEach(img => img.classList.remove('selected'));
             showModal(createProfileModal);
         });
 
@@ -286,11 +327,11 @@
             hideModal(newGameOptionsModal);
         });
 
-        // Create Profile Modal Buttons
         saveNewProfileButton.addEventListener('click', () => {
             const name = newDevNameInput.value.trim();
             const age = parseInt(newDevAgeInput.value);
             const capital = parseInt(newDevCapitalInput.value);
+            const avatar = selectedAvatarInput.value;
 
             if (!name) {
                 alert('Nama developer tidak boleh kosong.');
@@ -304,12 +345,16 @@
                 alert('Modal awal harus berupa angka dan minimal 1000.');
                 return;
             }
+            if (!avatar) {
+                alert('Silakan pilih avatar.');
+                return;
+            }
 
             const profiles = getDeveloperProfiles();
-            const newProfile = { name, age, capital, totalScore: 0, totalPlayTime: 0 };
+            const newProfile = { name, age, capital, avatar, totalScore: 0, totalPlayTime: 0 };
             profiles.push(newProfile);
             saveDeveloperProfiles(profiles);
-            setActiveDeveloper(profiles.length - 1); // Set the newly created profile as active
+            setActiveDeveloper(profiles.length - 1);
 
             hideModal(createProfileModal);
             displayDeveloperDetail(newProfile);
@@ -318,14 +363,24 @@
 
         cancelCreateProfileButton.addEventListener('click', () => {
             hideModal(createProfileModal);
-            showModal(newGameOptionsModal); // Go back to new game options
+            showModal(newGameOptionsModal);
         });
 
-        // Developer Detail Modal Buttons
         startDesignButton.addEventListener('click', () => {
             hideModal(developerDetailModal);
-            // Trigger map selection from here
             showModal(mapSelectionModal);
+        });
+
+        deleteProfileButton.addEventListener('click', () => {
+            if (confirm('Apakah Anda yakin ingin menghapus profil ini? Aksi ini tidak dapat dibatalkan.')) {
+                let profiles = getDeveloperProfiles();
+                profiles.splice(activeDeveloperIndex, 1);
+                saveDeveloperProfiles(profiles);
+                localStorage.removeItem('activeDeveloperIndex');
+                activeDeveloperIndex = -1;
+                hideModal(developerDetailModal);
+                showModal(newGameOptionsModal);
+            }
         });
 
         backToNewGameOptionsButton.addEventListener('click', () => {
@@ -333,9 +388,8 @@
             showModal(newGameOptionsModal);
         });
 
-        // Load Profile Modal Functions
         function loadDeveloperProfiles() {
-            profileListDiv.innerHTML = ''; // Clear previous list
+            profileListDiv.innerHTML = '';
             const profiles = getDeveloperProfiles();
             if (profiles.length === 0) {
                 profileListDiv.innerHTML = '<p>Belum ada profil tersimpan.</p>';
@@ -343,25 +397,37 @@
             }
 
             profiles.forEach((profile, index) => {
+                const profileContainer = document.createElement('div');
+                profileContainer.classList.add('profile-button-container');
+
+                const profileAvatar = document.createElement('img');
+                profileAvatar.src = profile.avatar || 'https://robohash.org/default.png?set=set4';
+                profileAvatar.classList.add('profile-button-avatar');
+
                 const profileButton = document.createElement('button');
                 profileButton.classList.add('menu-button');
+                profileButton.style.width = 'auto'; // override default width
+                profileButton.style.flexGrow = '1';
                 profileButton.textContent = `${profile.name} (Usia: ${profile.age}, Saldo: Rp. ${formatNumberWithThousandsSeparator(profile.capital)})`;
-                profileButton.addEventListener('click', () => {
+                
+                profileContainer.appendChild(profileAvatar);
+                profileContainer.appendChild(profileButton);
+
+                profileContainer.addEventListener('click', () => {
                     setActiveDeveloper(index);
                     hideModal(loadProfileModal);
                     displayDeveloperDetail(profile);
                     showModal(developerDetailModal);
                 });
-                profileListDiv.appendChild(profileButton);
+                profileListDiv.appendChild(profileContainer);
             });
         }
 
         cancelLoadProfileButton.addEventListener('click', () => {
             hideModal(loadProfileModal);
-            showModal(newGameOptionsModal); // Go back to new game options
+            showModal(newGameOptionsModal);
         });
 
-        // Map Selection Modal Buttons
         mapSelectionModal.querySelectorAll('.menu-button[data-size]').forEach(button => {
             button.addEventListener('click', () => {
                 const gridSize = button.dataset.size;
@@ -381,8 +447,8 @@
             }
         });
 
-        // Function to display developer details
         function displayDeveloperDetail(profile) {
+            detailDevAvatarEl.src = profile.avatar || 'https://robohash.org/default.png?set=set4';
             detailDevNameEl.textContent = profile.name;
             detailDevAgeEl.textContent = profile.age;
             detailDevCapitalEl.textContent = formatNumberWithThousandsSeparator(profile.capital);
@@ -390,7 +456,6 @@
             document.getElementById('detail-dev-playtime').textContent = formatNumberWithThousandsSeparator(profile.totalPlayTime || 0);
         }
 
-        // Close modal when clicking outside
         window.addEventListener('click', (event) => {
             if (event.target === newGameOptionsModal) hideModal(newGameOptionsModal);
             if (event.target === createProfileModal) hideModal(createProfileModal);

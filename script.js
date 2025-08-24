@@ -36,6 +36,10 @@ function initGame() {
     const fullscreenButton = document.getElementById('fullscreen-button');
     const buildingInfoPanel = document.getElementById('building-info-panel');
 
+    const newGameMenuButton = document.getElementById('new-game-menu-button');
+    const quitMapMenuButton = document.getElementById('quit-map-menu-button');
+    const exitMenuButton = document.getElementById('exit-menu-button');
+
     // Elemen untuk menampilkan jumlah bangunan
     const countRumahEl = document.getElementById('count-rumah');
     const countRumahMewahEl = document.getElementById('count-rumah-mewah');
@@ -379,12 +383,19 @@ function initGame() {
             buildingCounts[selectedTool]++;
         }
 
-        // Update tampilan sel
+        // Update tampilan sel dengan animasi
+        let newElement;
         if (item.type === 'road') {
-            cell.innerHTML = `<div class="${item.blockClass}"></div>`;
+            newElement = document.createElement('div');
+            newElement.className = item.blockClass;
         } else {
-            cell.innerHTML = `<i class="fas ${item.icon}"></i>`;
+            newElement = document.createElement('i');
+            newElement.className = `fas ${item.icon}`;
         }
+        newElement.classList.add('building-placed'); // Tambahkan kelas animasi
+        cell.innerHTML = ''; // Hapus konten lama
+        cell.appendChild(newElement); // Tambahkan elemen baru
+
         cell.dataset.type = selectedTool; // Simpan tipe di dataset untuk referensi cepat
         updateInfoPanel();
     }
@@ -501,9 +512,19 @@ function initGame() {
             }
         }
 
-        // Bersihkan grid internal dan tampilan sel
+        // Animasi penghapusan
+        const buildingElement = cell.firstChild;
+        if (buildingElement) {
+            buildingElement.classList.add('building-removed');
+            buildingElement.addEventListener('animationend', () => {
+                if (cell.contains(buildingElement)) {
+                    cell.innerHTML = ''; // Hapus setelah animasi selesai
+                }
+            }, { once: true });
+        }
+
+        // Bersihkan grid internal dan dataset
         gameGrid[row][col] = null;
-        cell.innerHTML = '';
         cell.removeAttribute('data-type');
         updateInfoPanel();
     }
@@ -571,13 +592,14 @@ function initGame() {
         let totalSellingTime = 0;
         let sellableHouses = 0;
         let sellableMewah = 0;
+        const sellableHouseCells = []; // Array to store sellable house cells
 
         for (let r = 0; r < gridSize; r++) {
             for (let c = 0; c < gridSize; c++) {
                 const building = gameGrid[r][c];
                 if (building === 'rumah' || building === 'rumah_mewah') {
                     if (isConnectedToRoad(r, c)) {
-                        let itemData, sellableCounter;
+                        let itemData;
                         if (building === 'rumah') {
                             sellableHouses++;
                             itemData = itemInfo.rumah;
@@ -585,6 +607,10 @@ function initGame() {
                             sellableMewah++;
                             itemData = itemInfo.rumah_mewah;
                         }
+
+                        // Add cell to list for animation
+                        const cellIndex = getIndex(r, c);
+                        sellableHouseCells.push(gridContainer.children[cellIndex]);
 
                         let houseSellingTime = itemData.baseSellingTime;
                         let totalReductionPercentage = 0;
@@ -619,6 +645,9 @@ function initGame() {
             return;
         }
 
+        // Add animation class to all sellable houses
+        sellableHouseCells.forEach(cell => cell.classList.add('selling-animation'));
+
         const loadingDurationMs = totalSellingTime * DAYS_TO_SECONDS_RATIO * 1000; 
         let startTime = Date.now();
 
@@ -648,6 +677,9 @@ function initGame() {
         };
 
         const showSummary = () => {
+            // Cleanup animation class
+            sellableHouseCells.forEach(cell => cell.classList.remove('selling-animation'));
+
             hidePopup(loadingPopup);
             const finalTotalPenjualan = (sellableHouses * itemInfo.rumah.nilaiJual) + (sellableMewah * itemInfo.rumah_mewah.nilaiJual);
             const rumahTidakTerjual = buildingCounts.rumah - sellableHouses;
@@ -677,10 +709,16 @@ function initGame() {
 
         requestAnimationFrame(updateProgress);
 
-        skipButton.onclick = () => {
+        const skipAction = () => {
             cancelAnimationFrame(animationFrameId);
             showSummary();
         };
+
+        skipButton.onclick = skipAction;
+        skipButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            skipAction();
+        });
     }
 
     buildingButtonsContainer.addEventListener('click', handleBuildingButtonClick);
@@ -778,6 +816,33 @@ function initGame() {
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('touchend', handleTouchEnd);
     window.addEventListener('touchmove', handleTouchMove);
+
+    if (newGameMenuButton) {
+        const newGameAction = () => window.location.href = 'dashboard.html';
+        newGameMenuButton.addEventListener('click', newGameAction);
+        newGameMenuButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            newGameAction();
+        });
+    }
+
+    if (quitMapMenuButton) {
+        const quitMapAction = () => window.location.href = 'dashboard.html';
+        quitMapMenuButton.addEventListener('click', quitMapAction);
+        quitMapMenuButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            quitMapAction();
+        });
+    }
+
+    if (exitMenuButton) {
+        const exitAction = () => window.location.href = 'index.html';
+        exitMenuButton.addEventListener('click', exitAction);
+        exitMenuButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            exitAction();
+        });
+    }
 
     resetGame();
 }
